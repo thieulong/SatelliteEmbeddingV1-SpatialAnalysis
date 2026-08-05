@@ -1,0 +1,103 @@
+{
+  "title": "AusHabitat",
+  "subtitle": "Bass Coast landscape change \u00b7 2017\u20132024",
+  "years": [
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "intervals": [
+    "2017_2018",
+    "2018_2019",
+    "2019_2020",
+    "2020_2021",
+    "2021_2022",
+    "2022_2023",
+    "2023_2024"
+  ],
+  "bounds": [
+    144.89996212751865,
+    -39.20211967286227,
+    146.30007632934735,
+    -38.09997665077603
+  ],
+  "feature_count": 13784,
+  "hotspot_feature_count": 13477,
+  "coldspot_feature_count": 307,
+  "context_feature_count": 13784,
+  "region_year_rows": 110272,
+  "detail_shard_size": 1000,
+  "detail_shard_count": 14,
+  "surface_overlay": "data/change_state_overlay.png",
+  "annual_overlays": {
+    "2017_2018": "data/annual_hotspot_2017_2018.png",
+    "2018_2019": "data/annual_hotspot_2018_2019.png",
+    "2019_2020": "data/annual_hotspot_2019_2020.png",
+    "2020_2021": "data/annual_hotspot_2020_2021.png",
+    "2021_2022": "data/annual_hotspot_2021_2022.png",
+    "2022_2023": "data/annual_hotspot_2022_2023.png",
+    "2023_2024": "data/annual_hotspot_2023_2024.png"
+  },
+  "state_summary": [
+    {
+      "state_code": 0,
+      "state_label": "no_data",
+      "cell_count_30m": 11983924,
+      "share_of_grid": 0.5639058,
+      "share_of_finite_grid": null
+    },
+    {
+      "state_code": 1,
+      "state_label": "cold",
+      "cell_count_30m": 379956,
+      "share_of_grid": 0.0178789,
+      "share_of_finite_grid": 0.0409978
+    },
+    {
+      "state_code": 2,
+      "state_label": "background",
+      "cell_count_30m": 7706057,
+      "share_of_grid": 0.36261,
+      "share_of_finite_grid": 0.8314947
+    },
+    {
+      "state_code": 3,
+      "state_label": "episodic_hotspot",
+      "cell_count_30m": 853175,
+      "share_of_grid": 0.0401463,
+      "share_of_finite_grid": 0.0920588
+    },
+    {
+      "state_code": 4,
+      "state_label": "persistent_hotspot",
+      "cell_count_30m": 328528,
+      "share_of_grid": 0.0154589,
+      "share_of_finite_grid": 0.0354486
+    }
+  ],
+  "behaviour_counts": {
+    "mostly_single_period_change": 9884,
+    "mixed_change": 2416,
+    "repeated_change": 1177,
+    "low_change_reference": 307
+  },
+  "evidence_counts": {
+    "embedding": 13477,
+    "dea": 12856,
+    "ndvi": 12243,
+    "all_three": 11735
+  },
+  "thresholds": {
+    "endpoint_p95": 0.445133,
+    "annual_hotspot": 0.45,
+    "variance_p95": 0.0084274,
+    "ndvi_region_event": 0.05270013838570708
+  },
+  "coverage_note": "Every interaction region has an annual context record for 2017-2024. One small region has an unknown DEA Level 4 class in 2021; DEA Level 3 and NDVI remain available.",
+  "pixel_context_note": "Annual DEA Level 3, Level 4, NDVI and clear-observation COGs are aligned to the Phase 9 30 m grid."
+}

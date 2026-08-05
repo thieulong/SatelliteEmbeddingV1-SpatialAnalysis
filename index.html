@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="AusHabitat landscape change explorer for Bass Coast." />
+    <title>AusHabitat</title>
+    <link rel="preconnect" href="https://tile.openstreetmap.org" />
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.css" />
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <button class="icon-button mobile-only" id="openFilters" aria-label="Open filters" title="Open filters"><i data-lucide="sliders-horizontal"></i></button>
+      <div class="brand-block">
+        <img class="brand-logo" src="public/assets/cnps-logo.jpeg" alt="Centre for Nature Positive Solutions" />
+      </div>
+      <div class="product-title"><h1>AusHabitat</h1><p>Product of CNPS</p></div>
+      <div class="header-summary" id="headerSummary">Loading complete landscape history…</div>
+      <div class="header-actions">
+        <button class="icon-button" id="fitBounds" aria-label="Fit map bounds" title="Fit map bounds"><i data-lucide="maximize"></i></button>
+        <button class="icon-button" id="showAbout" aria-label="About the evidence" title="About the evidence"><i data-lucide="info"></i></button>
+      </div>
+    </header>
+
+    <aside class="sidebar" id="sidebar" aria-label="Search and filters">
+      <div class="sidebar-heading"><span>Explore</span><button class="icon-button mobile-only" id="closeFilters" aria-label="Close filters" title="Close filters"><i data-lucide="x"></i></button></div>
+      <div class="search-wrap">
+        <i data-lucide="search"></i>
+        <input id="searchInput" type="search" autocomplete="off" placeholder="Place, postcode, coordinates or region ID" />
+        <button class="clear-search" id="clearSearch" aria-label="Clear search" title="Clear search"><i data-lucide="x"></i></button>
+        <div class="search-results" id="searchResults" hidden></div>
+      </div>
+
+      <section class="filter-section">
+        <div class="section-title"><span>Map regions</span><span class="result-count" id="resultCount">—</span></div>
+        <label class="check-row"><input type="checkbox" id="showHotspots" checked /><span class="swatch hotspot"></span><span>Change areas (hot spots)</span><small id="hotspotCount">—</small></label>
+        <label class="check-row"><input type="checkbox" id="showColdspots" checked /><span class="swatch coldspot"></span><span>Low-change areas (cold spots)</span><small id="coldspotCount">—</small></label>
+      </section>
+
+      <section class="filter-section">
+        <div class="section-title"><span>Change pattern</span><button class="help-tip" data-help="This describes how much of the area changed strongly in two or more annual periods. Change mainly once: under 10%. Some repeated change: 10–49%. Widespread repeated change: at least 50%. Different cells may change in different years." aria-label="Change pattern explanation"><i data-lucide="circle-help"></i></button></div>
+        <select id="changePattern">
+          <option value="all">All patterns</option>
+          <option value="mostly_single_period_change">Change mainly once</option>
+          <option value="mixed_change">Some repeated change</option>
+          <option value="repeated_change">Widespread repeated change</option>
+          <option value="low_change_reference">Mostly unchanged</option>
+        </select>
+        <label class="field-label" for="minArea">Minimum region area <strong id="minAreaValue">0 ha</strong></label>
+        <input class="range-input" id="minArea" type="range" min="0" max="25" step="0.5" value="0" />
+        <div class="check-help-row">
+          <label class="check-row compact"><input type="checkbox" id="annualHotspotsOnly" disabled /><span>Show only areas active this period</span></label>
+          <button class="help-tip" data-help="Available after choosing an annual period on the timeline. It keeps areas where at least 5% of the region exceeded the annual embedding-change threshold of 0.45 during that period." aria-label="Selected-period activity explanation"><i data-lucide="circle-help"></i></button>
+        </div>
+      </section>
+
+      <section class="filter-section">
+        <div class="section-title"><span>Supporting evidence</span><button class="help-tip" data-help="Hot and cold areas are already defined by AI embedding. Use these filters to keep only areas where DEA records a land-cover transition, NDVI records a substantial vegetation change, or both." aria-label="Supporting evidence explanation"><i data-lucide="circle-help"></i></button></div>
+        <p class="filter-note">The map is defined by AI embedding. Add an independent cross-check:</p>
+        <label class="evidence-row"><input type="checkbox" id="evidenceDea" /><span class="source-dot dea"></span><span>DEA land-cover transition</span></label>
+        <label class="evidence-row"><input type="checkbox" id="evidenceNdvi" /><span class="source-dot ndvi"></span><span>NDVI vegetation change</span></label>
+        <div class="match-control" id="evidenceMatchControl" role="group" aria-label="Evidence matching" hidden>
+          <button class="match-option active" data-match="all">Require both</button>
+          <button class="match-option" data-match="any">Either one</button>
+        </div>
+        <div class="field-title"><label for="vegetationDirection">Vegetation direction</label><button class="help-tip" data-help="Net greening means average NDVI in the final study year was at least 0.0527 higher than in the first year. Net browning means it was at least 0.0527 lower. No clear net change means the difference stayed within that threshold. Intermediate years may still fluctuate." aria-label="Vegetation direction explanation"><i data-lucide="circle-help"></i></button></div>
+        <select id="vegetationDirection">
+          <option value="all">All directions</option>
+          <option value="greening">Net greening</option>
+          <option value="browning">Net browning</option>
+          <option value="stable">No clear net change</option>
+        </select>
+      </section>
+
+      <button class="reset-button" id="resetFilters"><i data-lucide="rotate-ccw"></i><span>Reset filters</span></button>
+      <div class="coverage-strip"><span class="coverage-dot"></span><span>Annual context for every mapped region</span></div>
+    </aside>
+
+    <main class="map-shell">
+      <div id="map" aria-label="Interactive AusHabitat map"></div>
+      <div class="map-loading" id="mapLoading"><span class="spinner"></span><span>Preparing 13,784 regions…</span></div>
+      <div class="map-toolbar">
+        <button class="icon-button light" id="zoomIn" aria-label="Zoom in" title="Zoom in"><i data-lucide="plus"></i></button>
+        <button class="icon-button light" id="zoomOut" aria-label="Zoom out" title="Zoom out"><i data-lucide="minus"></i></button>
+        <button class="icon-button light" id="locateMe" aria-label="Use my location" title="Use my location"><i data-lucide="locate-fixed"></i></button>
+      </div>
+      <div class="legend" id="legend"></div>
+      <div class="map-status" id="mapStatus">2017–2024 overview</div>
+    </main>
+
+    <aside class="detail-panel" id="detailPanel" aria-label="Selected region details" hidden>
+      <div class="detail-header">
+        <div><span class="eyebrow" id="detailState">Landscape region</span><h2 id="detailTitle">Selected region</h2><p id="detailLocation">—</p></div>
+        <button class="icon-button" id="closeDetails" aria-label="Close details" title="Close details"><i data-lucide="x"></i></button>
+      </div>
+      <div class="detail-tabs" role="tablist">
+        <button class="detail-tab active" data-tab="overview">Summary</button>
+        <button class="detail-tab" data-tab="timeline">Timeline</button>
+        <button class="detail-tab" data-tab="context">Land context</button>
+      </div>
+      <div class="detail-content" id="detailContent"></div>
+    </aside>
+
+    <nav class="timeline" aria-label="Change period">
+      <div class="timeline-label">
+        <button class="icon-button small" id="previousTime" aria-label="Previous period" title="Previous period"><i data-lucide="chevron-left"></i></button>
+        <div><span>Time view</span><strong id="timeViewLabel">2017–2024 overview</strong></div>
+        <button class="icon-button small" id="nextTime" aria-label="Next period" title="Next period"><i data-lucide="chevron-right"></i></button>
+      </div>
+      <div class="timeline-track" id="timelineTrack">
+        <button class="time-step active" data-interval="endpoint"><span>Overview</span><small>2017–2024</small></button>
+        <button class="time-step" data-interval="2017_2018"><span>2017</span><small>to 2018</small></button>
+        <button class="time-step" data-interval="2018_2019"><span>2018</span><small>to 2019</small></button>
+        <button class="time-step" data-interval="2019_2020"><span>2019</span><small>to 2020</small></button>
+        <button class="time-step" data-interval="2020_2021"><span>2020</span><small>to 2021</small></button>
+        <button class="time-step" data-interval="2021_2022"><span>2021</span><small>to 2022</small></button>
+        <button class="time-step" data-interval="2022_2023"><span>2022</span><small>to 2023</small></button>
+        <button class="time-step" data-interval="2023_2024"><span>2023</span><small>to 2024</small></button>
+      </div>
+    </nav>
+
+    <dialog class="about-dialog" id="aboutDialog">
+      <div class="dialog-heading"><div><span class="eyebrow">AusHabitat evidence</span><h2>How to read this map</h2></div><button class="icon-button" id="closeAbout" aria-label="Close" title="Close"><i data-lucide="x"></i></button></div>
+      <div class="dialog-grid">
+        <div><strong>AI embedding</strong><p>Measures how strongly the satellite-observed landscape signal changed. It does not identify the cause by itself.</p></div>
+        <div><strong>DEA Land Cover</strong><p>Provides broad and detailed annual land-cover classes and the proportion of each region represented by the dominant class.</p></div>
+        <div><strong>NDVI</strong><p>Measures vegetation greenness and indicates net greening, browning or no clear net change.</p></div>
+        <div><strong>Complete regional history</strong><p>All 13,784 regions have annual records from 2017 to 2024. One small region has an unknown detailed DEA class in 2021.</p></div>
+      </div>
+    </dialog>
+
+    <div class="help-popover" id="helpPopover" role="tooltip" hidden></div>
+
+    <script src="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script src="src/app.js" defer></script>
+  </body>
+</html>
