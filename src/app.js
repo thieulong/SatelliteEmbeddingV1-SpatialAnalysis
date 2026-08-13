@@ -16,6 +16,10 @@ const BEHAVIOURS = {
   mostly_single_period_change: { label: "Change mainly once", short: "Mainly once", className: "single", color: "#e7ad3b" },
   low_change_reference: { label: "Mostly unchanged", short: "Mostly unchanged", className: "cold", color: "#2c70a5" },
 };
+const BASEMAPS = {
+  satellite: { label: "Satellite", layer: "satellite" },
+  streets: { label: "Map", layer: "osm" },
+};
 const LOCAL_PLACES = [
   { name: "Wonthaggi", detail: "VIC 3995", center: [145.591, -38.606] },
   { name: "Inverloch", detail: "VIC 3996", center: [145.729, -38.633] },
@@ -45,6 +49,7 @@ const app = {
   helpAnchor: null,
   helpPinned: false,
   helpTimer: null,
+  basemap: "satellite",
 };
 
 const $ = (id) => document.getElementById(id);
@@ -138,8 +143,24 @@ function createMap() {
     container: "map",
     style: {
       version: 8,
-      sources: { osm: { type: "raster", tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"], tileSize: 256, attribution: "© OpenStreetMap contributors" } },
-      layers: [{ id: "osm", type: "raster", source: "osm", minzoom: 0, maxzoom: 19 }],
+      sources: {
+        satellite: {
+          type: "raster",
+          tiles: ["https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"],
+          tileSize: 256,
+          attribution: "Source: Esri, Vantor, Earthstar Geographics, and the GIS User Community",
+        },
+        osm: {
+          type: "raster",
+          tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+          tileSize: 256,
+          attribution: "© OpenStreetMap contributors",
+        },
+      },
+      layers: [
+        { id: "satellite", type: "raster", source: "satellite", minzoom: 0, maxzoom: 19 },
+        { id: "osm", type: "raster", source: "osm", minzoom: 0, maxzoom: 19, layout: { visibility: "none" } },
+      ],
     },
     center: [(west + east) / 2, (south + north) / 2],
     zoom: 8.7,
@@ -190,6 +211,36 @@ function createMap() {
     applyFilters();
     $("mapLoading").classList.add("hidden");
   });
+}
+
+function setBasemap(name) {
+  const selected = BASEMAPS[name];
+  if (!selected || !app.map) return;
+  app.basemap = name;
+  Object.entries(BASEMAPS).forEach(([key, item]) => {
+    app.map.setLayoutProperty(item.layer, "visibility", key === name ? "visible" : "none");
+  });
+  document.querySelectorAll(".basemap-option").forEach((button) => {
+    const active = button.dataset.basemap === name;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-checked", String(active));
+  });
+  const toggle = $("basemapToggle");
+  toggle.setAttribute("aria-label", `Choose map view. ${selected.label} selected`);
+  closeBasemapMenu();
+}
+
+function closeBasemapMenu() {
+  $("basemapMenu").hidden = true;
+  $("basemapToggle").setAttribute("aria-expanded", "false");
+}
+
+function toggleBasemapMenu() {
+  const menu = $("basemapMenu");
+  const opening = menu.hidden;
+  menu.hidden = !opening;
+  $("basemapToggle").setAttribute("aria-expanded", String(opening));
+  if (opening) menu.querySelector(".basemap-option.active")?.focus();
 }
 
 function behaviourColourExpression() {
@@ -621,6 +672,11 @@ function bindEvents() {
     applyFilters();
   }));
   $("resetFilters").addEventListener("click", resetFilters); $("fitBounds").addEventListener("click", fitBounds);
+  $("basemapToggle").addEventListener("click", (event) => {
+    event.stopPropagation();
+    toggleBasemapMenu();
+  });
+  document.querySelectorAll(".basemap-option").forEach((button) => button.addEventListener("click", () => setBasemap(button.dataset.basemap)));
   $("zoomIn").addEventListener("click", () => app.map.zoomIn()); $("zoomOut").addEventListener("click", () => app.map.zoomOut());
   $("locateMe").addEventListener("click", () => navigator.geolocation?.getCurrentPosition((position) => activateSearchResult({ name: "Current location", detail: "Browser location", center: [position.coords.longitude, position.coords.latitude] })));
   $("closeDetails").addEventListener("click", closeDetails);
@@ -636,7 +692,10 @@ function bindEvents() {
   $("searchInput").addEventListener("input", (event) => { clearTimeout(timer); timer = setTimeout(() => search(event.target.value), 250); });
   $("searchInput").addEventListener("keydown", (event) => { if (event.key === "Escape") $("searchResults").hidden = true; });
   $("clearSearch").addEventListener("click", () => { $("searchInput").value = ""; $("searchResults").hidden = true; if (app.searchMarker) app.searchMarker.remove(); });
-  document.addEventListener("click", (event) => { if (!event.target.closest(".search-wrap")) $("searchResults").hidden = true; });
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".search-wrap")) $("searchResults").hidden = true;
+    if (!event.target.closest(".basemap-control")) closeBasemapMenu();
+  });
   $("openFilters").addEventListener("click", () => $("sidebar").classList.add("open")); $("closeFilters").addEventListener("click", () => $("sidebar").classList.remove("open"));
   const dialog = $("aboutDialog");
   $("showAbout").addEventListener("click", () => dialog.showModal()); $("closeAbout").addEventListener("click", () => dialog.close());
