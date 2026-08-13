@@ -263,7 +263,7 @@ select { width: 100%; height: 35px; padding: 0 9px; border: 1px solid #bcc5c9; b
   .timeline-label { width: 126px; min-width: 126px; }
   .timeline-label .icon-button { width: 24px; }
   .timeline-label strong { font-size: 8px; }
-  .legend { right: 8px; bottom: 28px; min-width: 148px; padding: 7px 8px; }
+  .legend { right: 8px; bottom: calc(var(--timeline-height) + 8px); min-width: 148px; padding: 7px 8px; }
   .map-toolbar { top: 8px; right: 8px; }
   .basemap-control { left: 8px; bottom: calc(var(--timeline-height) + 8px); }
   .basemap-menu { width: min(210px, calc(100vw - 16px)); }
