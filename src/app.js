@@ -17,13 +17,6 @@ const BEHAVIOURS = {
   mostly_single_period_change: { label: "Change mainly once", short: "Mainly once", className: "single", color: "#e7ad3b" },
   low_change_reference: { label: "Mostly unchanged", short: "Mostly unchanged", className: "cold", color: "#2c70a5" },
 };
-const DEA_CLASS = {
-  natural: "n",
-  cultivated: "c",
-  artificial: "a",
-  water: "w",
-  bare: "b",
-};
 const BASEMAPS = {
   annual: { label: "Annual satellite", layer: "annual-satellite" },
   reference: { label: "Satellite reference", layer: "reference-satellite" },
@@ -339,55 +332,6 @@ function surfaceCoordinates() {
   return [[west, north], [east, north], [east, south], [west, south]];
 }
 
-function transitionYears() {
-  return app.interval === "endpoint" ? [2017, 2024] : app.interval.split("_").map(Number);
-}
-
-function deaYearProperty(year) {
-  return `d${String(year).slice(-2)}`;
-}
-
-function landTransitionMatches(fromClass, toClass, transition) {
-  if (transition === "all") return true;
-  if (transition === "any_change") return fromClass !== toClass;
-  if (transition === "no_change") return fromClass === toClass;
-  if (transition === "natural_to_cultivated") return fromClass === DEA_CLASS.natural && toClass === DEA_CLASS.cultivated;
-  if (transition === "natural_to_artificial") return fromClass === DEA_CLASS.natural && toClass === DEA_CLASS.artificial;
-  if (transition === "cultivated_to_natural") return fromClass === DEA_CLASS.cultivated && toClass === DEA_CLASS.natural;
-  if (transition === "cultivated_to_artificial") return fromClass === DEA_CLASS.cultivated && toClass === DEA_CLASS.artificial;
-  if (transition === "artificial_to_vegetation") {
-    return fromClass === DEA_CLASS.artificial && [DEA_CLASS.natural, DEA_CLASS.cultivated].includes(toClass);
-  }
-  if (transition === "to_water_or_bare") {
-    return fromClass !== toClass && [DEA_CLASS.water, DEA_CLASS.bare].includes(toClass);
-  }
-  return true;
-}
-
-function landTransitionExpression(transition) {
-  const [startYear, endYear] = transitionYears();
-  const from = ["get", deaYearProperty(startYear)];
-  const to = ["get", deaYearProperty(endYear)];
-  if (transition === "any_change") return ["!=", from, to];
-  if (transition === "no_change") return ["==", from, to];
-  if (transition === "natural_to_cultivated") return ["all", ["==", from, DEA_CLASS.natural], ["==", to, DEA_CLASS.cultivated]];
-  if (transition === "natural_to_artificial") return ["all", ["==", from, DEA_CLASS.natural], ["==", to, DEA_CLASS.artificial]];
-  if (transition === "cultivated_to_natural") return ["all", ["==", from, DEA_CLASS.cultivated], ["==", to, DEA_CLASS.natural]];
-  if (transition === "cultivated_to_artificial") return ["all", ["==", from, DEA_CLASS.cultivated], ["==", to, DEA_CLASS.artificial]];
-  if (transition === "artificial_to_vegetation") {
-    return ["all", ["==", from, DEA_CLASS.artificial], ["match", to, [DEA_CLASS.natural, DEA_CLASS.cultivated], true, false]];
-  }
-  if (transition === "to_water_or_bare") {
-    return ["all", ["!=", from, to], ["match", to, [DEA_CLASS.water, DEA_CLASS.bare], true, false]];
-  }
-  return null;
-}
-
-function updateTransitionPeriod() {
-  const [startYear, endYear] = transitionYears();
-  $("landTransitionPeriod").textContent = `${startYear} → ${endYear}`;
-}
-
 function addSurfaceLayer(layerId, relativeUrl) {
   if (app.map.getLayer(layerId)) app.map.removeLayer(layerId);
   if (app.map.getSource(layerId)) app.map.removeSource(layerId);
@@ -408,7 +352,6 @@ function setSurfaceLayers(hotspotRelativeUrl) {
 
 function updateSurfaceVisibility(filters) {
   const regionFilterActive = filters.pattern !== "all"
-    || filters.landTransition !== "all"
     || filters.minArea > 0
     || filters.annualOnly
     || filters.evidence.length > 0
@@ -441,7 +384,6 @@ function currentFilters() {
   return {
     hotspots: $("showHotspots").checked,
     coldspots: $("showColdspots").checked,
-    landTransition: $("landTransition").value,
     pattern: $("changePattern").value,
     minArea: Number($("minArea").value),
     annualOnly: $("annualHotspotsOnly").checked,
@@ -457,8 +399,6 @@ function currentFilters() {
 function featurePasses(properties, filters) {
   const isCold = properties.feature_type === "coldspot_patch";
   if ((isCold && !filters.coldspots) || (!isCold && !filters.hotspots)) return false;
-  const [startYear, endYear] = transitionYears();
-  if (!landTransitionMatches(properties[deaYearProperty(startYear)], properties[deaYearProperty(endYear)], filters.landTransition)) return false;
   if (filters.pattern !== "all" && properties.behaviour !== filters.pattern) return false;
   if (Number(properties.area_ha) < filters.minArea) return false;
   if (filters.annualOnly && app.interval !== "endpoint" && Number(properties[`hotspot_${app.interval}`] || 0) < 0.05) return false;
@@ -479,7 +419,6 @@ function mapFilterExpression(filters) {
     ["match", ["get", "feature_type"], types.length ? types : ["__none__"], true, false],
     [">=", ["get", "area_ha"], filters.minArea],
   ];
-  if (filters.landTransition !== "all") conditions.push(landTransitionExpression(filters.landTransition));
   if (filters.pattern !== "all") conditions.push(["==", ["get", "behaviour"], filters.pattern]);
   if (filters.annualOnly && app.interval !== "endpoint") conditions.push([">=", ["get", `hotspot_${app.interval}`], 0.05]);
   if (filters.vegetation !== "all") conditions.push(["==", ["get", "ndvi_direction"], filters.vegetation]);
@@ -523,7 +462,6 @@ function renderLegend(annual = false) {
 
 function setInterval(interval) {
   app.interval = interval;
-  updateTransitionPeriod();
   const periodFilter = $("annualHotspotsOnly");
   periodFilter.disabled = interval === "endpoint";
   if (interval === "endpoint") periodFilter.checked = false;
@@ -770,7 +708,7 @@ function renderContext(detail) {
 
 function resetFilters() {
   $("showHotspots").checked = true; $("showColdspots").checked = true;
-  $("landTransition").value = "all"; $("changePattern").value = "all"; $("minArea").value = 0; $("annualHotspotsOnly").checked = false;
+  $("changePattern").value = "all"; $("minArea").value = 0; $("annualHotspotsOnly").checked = false;
   $("evidenceDea").checked = false; $("evidenceNdvi").checked = false;
   $("vegetationDirection").value = "all"; app.evidenceMatch = "all";
   document.querySelectorAll(".match-option").forEach((button) => button.classList.toggle("active", button.dataset.match === "all"));
@@ -830,7 +768,7 @@ function shiftInterval(direction) {
 }
 
 function bindEvents() {
-  ["showHotspots", "showColdspots", "landTransition", "changePattern", "minArea", "annualHotspotsOnly", "evidenceDea", "evidenceNdvi", "vegetationDirection"].forEach((id) => $(id).addEventListener("input", applyFilters));
+  ["showHotspots", "showColdspots", "changePattern", "minArea", "annualHotspotsOnly", "evidenceDea", "evidenceNdvi", "vegetationDirection"].forEach((id) => $(id).addEventListener("input", applyFilters));
   document.querySelectorAll(".match-option").forEach((button) => button.addEventListener("click", () => {
     app.evidenceMatch = button.dataset.match;
     document.querySelectorAll(".match-option").forEach((item) => item.classList.toggle("active", item === button));
@@ -900,7 +838,6 @@ async function initialize() {
     $("hotspotCount").textContent = app.metadata.hotspot_feature_count.toLocaleString();
     $("coldspotCount").textContent = app.metadata.coldspot_feature_count.toLocaleString();
     updateImageryYearControl();
-    updateTransitionPeriod();
     updateMapStatus();
     bindEvents(); renderLegend(false); createMap();
   } catch (error) {
