@@ -1,5 +1,6 @@
 const DATA_ROOT = "public/data";
 const INTERVALS = ["endpoint", "2017_2018", "2018_2019", "2019_2020", "2020_2021", "2021_2022", "2022_2023", "2023_2024"];
+const IMAGERY_YEARS = Array.from({ length: 9 }, (_, index) => 2017 + index);
 const INTERVAL_LABELS = {
   endpoint: "2017–2024 overview",
   "2017_2018": "2017 → 2018",
@@ -17,7 +18,8 @@ const BEHAVIOURS = {
   low_change_reference: { label: "Mostly unchanged", short: "Mostly unchanged", className: "cold", color: "#2c70a5" },
 };
 const BASEMAPS = {
-  satellite: { label: "Satellite", layer: "satellite" },
+  annual: { label: "Annual satellite", layer: "annual-satellite" },
+  reference: { label: "Satellite reference", layer: "reference-satellite" },
   streets: { label: "Map", layer: "osm" },
 };
 const LOCAL_PLACES = [
@@ -49,7 +51,8 @@ const app = {
   helpAnchor: null,
   helpPinned: false,
   helpTimer: null,
-  basemap: "satellite",
+  basemap: "annual",
+  imageryYear: 2024,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -137,6 +140,74 @@ async function getDetail(featureId) {
   return app.shardCache.get(shard)[featureId];
 }
 
+function annualSatelliteSource(year) {
+  const base = "https://ows.dea.ga.gov.au/wms";
+  const query = [
+    "service=WMS",
+    "version=1.1.1",
+    "request=GetMap",
+    "layers=ga_ls8cls9c_gm_cyear_3",
+    "styles=simple_rgb",
+    "format=image%2Fpng",
+    "transparent=false",
+    "height=256",
+    "width=256",
+    "srs=EPSG%3A3857",
+    `time=${year}-01-01`,
+    "bbox={bbox-epsg-3857}",
+  ].join("&");
+  return {
+    type: "raster",
+    tiles: [`${base}?${query}`],
+    tileSize: 256,
+    maxzoom: 14,
+    attribution: '<a href="https://knowledge.dea.ga.gov.au/data/product/dea-geometric-median-and-median-absolute-deviation-landsat/" target="_blank" rel="noopener">DEA GeoMAD</a> · Geoscience Australia',
+  };
+}
+
+function updateMapStatus() {
+  const analysis = app.interval === "endpoint" ? "2017–2024 overview" : `Change during ${INTERVAL_LABELS[app.interval]}`;
+  const imagery = app.basemap === "annual" ? `annual satellite ${app.imageryYear}`
+    : app.basemap === "reference" ? "satellite reference" : "street map";
+  $("mapStatus").textContent = `${analysis} · ${imagery}`;
+}
+
+function updateImageryYearControl() {
+  $("imageryYearValue").textContent = app.imageryYear;
+  $("previousImageryYear").disabled = app.imageryYear === IMAGERY_YEARS[0];
+  $("nextImageryYear").disabled = app.imageryYear === IMAGERY_YEARS.at(-1);
+  $("imageryYearControl").setAttribute("aria-label", `Annual satellite imagery for ${app.imageryYear}`);
+}
+
+function setImageryYear(year) {
+  const nextYear = Math.max(IMAGERY_YEARS[0], Math.min(IMAGERY_YEARS.at(-1), Number(year)));
+  if (!IMAGERY_YEARS.includes(nextYear)) return;
+  const changed = nextYear !== app.imageryYear;
+  app.imageryYear = nextYear;
+  updateImageryYearControl();
+  updateMapStatus();
+  if (!changed || !app.map?.isStyleLoaded()) return;
+
+  if (app.map.getLayer("annual-satellite")) app.map.removeLayer("annual-satellite");
+  if (app.map.getSource("annual-satellite")) app.map.removeSource("annual-satellite");
+  app.map.addSource("annual-satellite", annualSatelliteSource(nextYear));
+  const beforeLayer = ["surface-cold-overlay", "surface-hotspot-overlay", "regions-fill"]
+    .find((layerId) => app.map.getLayer(layerId));
+  app.map.addLayer({
+    id: "annual-satellite",
+    type: "raster",
+    source: "annual-satellite",
+    minzoom: 0,
+    maxzoom: 20,
+    layout: { visibility: app.basemap === "annual" ? "visible" : "none" },
+  }, beforeLayer);
+}
+
+function shiftImageryYear(direction) {
+  const current = IMAGERY_YEARS.indexOf(app.imageryYear);
+  setImageryYear(IMAGERY_YEARS[Math.max(0, Math.min(IMAGERY_YEARS.length - 1, current + direction))]);
+}
+
 function createMap() {
   const [west, south, east, north] = app.metadata.bounds;
   app.map = new maplibregl.Map({
@@ -144,7 +215,8 @@ function createMap() {
     style: {
       version: 8,
       sources: {
-        satellite: {
+        "annual-satellite": annualSatelliteSource(app.imageryYear),
+        "reference-satellite": {
           type: "raster",
           tiles: ["https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"],
           tileSize: 256,
@@ -158,7 +230,8 @@ function createMap() {
         },
       },
       layers: [
-        { id: "satellite", type: "raster", source: "satellite", minzoom: 0, maxzoom: 19 },
+        { id: "annual-satellite", type: "raster", source: "annual-satellite", minzoom: 0, maxzoom: 20 },
+        { id: "reference-satellite", type: "raster", source: "reference-satellite", minzoom: 0, maxzoom: 20, layout: { visibility: "none" } },
         { id: "osm", type: "raster", source: "osm", minzoom: 0, maxzoom: 19, layout: { visibility: "none" } },
       ],
     },
@@ -170,7 +243,7 @@ function createMap() {
   });
   app.map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
   app.map.on("load", () => {
-    addSurfaceLayer(app.metadata.surface_overlay);
+    setSurfaceLayers(app.metadata.hotspot_surface_overlay);
     app.map.addSource("regions", { type: "geojson", data: app.features });
     app.map.addLayer({
       id: "regions-fill", type: "fill", source: "regions",
@@ -227,6 +300,8 @@ function setBasemap(name) {
   });
   const toggle = $("basemapToggle");
   toggle.setAttribute("aria-label", `Choose map view. ${selected.label} selected`);
+  $("imageryYearControl").hidden = name !== "annual";
+  updateMapStatus();
   closeBasemapMenu();
 }
 
@@ -257,11 +332,31 @@ function surfaceCoordinates() {
   return [[west, north], [east, north], [east, south], [west, south]];
 }
 
-function addSurfaceLayer(relativeUrl) {
-  if (app.map.getLayer("surface-overlay")) app.map.removeLayer("surface-overlay");
-  if (app.map.getSource("surface-overlay")) app.map.removeSource("surface-overlay");
-  app.map.addSource("surface-overlay", { type: "image", url: `public/${relativeUrl}`, coordinates: surfaceCoordinates() });
-  app.map.addLayer({ id: "surface-overlay", type: "raster", source: "surface-overlay", paint: { "raster-opacity": 0.82 } }, app.map.getLayer("regions-fill") ? "regions-fill" : undefined);
+function addSurfaceLayer(layerId, relativeUrl) {
+  if (app.map.getLayer(layerId)) app.map.removeLayer(layerId);
+  if (app.map.getSource(layerId)) app.map.removeSource(layerId);
+  app.map.addSource(layerId, { type: "image", url: `public/${relativeUrl}`, coordinates: surfaceCoordinates() });
+  app.map.addLayer({
+    id: layerId,
+    type: "raster",
+    source: layerId,
+    paint: { "raster-opacity": 0.82 },
+  }, app.map.getLayer("regions-fill") ? "regions-fill" : undefined);
+}
+
+function setSurfaceLayers(hotspotRelativeUrl) {
+  addSurfaceLayer("surface-cold-overlay", app.metadata.coldspot_surface_overlay);
+  addSurfaceLayer("surface-hotspot-overlay", hotspotRelativeUrl);
+  updateSurfaceVisibility(currentFilters());
+}
+
+function updateSurfaceVisibility(filters) {
+  if (app.map?.getLayer("surface-hotspot-overlay")) {
+    app.map.setLayoutProperty("surface-hotspot-overlay", "visibility", filters.hotspots ? "visible" : "none");
+  }
+  if (app.map?.getLayer("surface-cold-overlay")) {
+    app.map.setLayoutProperty("surface-cold-overlay", "visibility", filters.coldspots ? "visible" : "none");
+  }
 }
 
 function fitBounds() {
@@ -316,7 +411,7 @@ function mapFilterExpression(filters) {
   if (filters.hotspots) types.push("hotspot_patch");
   if (filters.coldspots) types.push("coldspot_patch");
   const conditions = [
-    ["match", ["get", "feature_type"], types, true, false],
+    ["match", ["get", "feature_type"], types.length ? types : ["__none__"], true, false],
     [">=", ["get", "area_ha"], filters.minArea],
   ];
   if (filters.pattern !== "all") conditions.push(["==", ["get", "behaviour"], filters.pattern]);
@@ -336,6 +431,8 @@ function applyFilters() {
   $("resultCount").textContent = `${count.toLocaleString()} shown`;
   $("minAreaValue").textContent = `${formatNumber(filters.minArea, 1)} ha`;
   $("evidenceMatchControl").hidden = filters.evidence.length < 2;
+  $("legend").hidden = !filters.hotspots && !filters.coldspots;
+  updateSurfaceVisibility(filters);
   if (app.map?.getLayer("regions-fill")) {
     const expression = mapFilterExpression(filters);
     app.map.setFilter("regions-fill", expression);
@@ -365,12 +462,13 @@ function setInterval(interval) {
   if (interval === "endpoint") periodFilter.checked = false;
   document.querySelectorAll(".time-step").forEach((button) => button.classList.toggle("active", button.dataset.interval === interval));
   $("timeViewLabel").textContent = INTERVAL_LABELS[interval];
-  $("mapStatus").textContent = interval === "endpoint" ? "2017–2024 overview" : `Change during ${INTERVAL_LABELS[interval]}`;
+  const imageryYear = interval === "endpoint" ? 2024 : Number(interval.split("_")[1]);
+  setImageryYear(imageryYear);
   if (app.map?.getLayer("regions-fill")) {
     if (interval === "endpoint") {
       app.map.setPaintProperty("regions-fill", "fill-color", behaviourColourExpression());
       app.map.setPaintProperty("regions-fill", "fill-opacity", ["case", ["boolean", ["feature-state", "hover"], false], 0.82, 0.57]);
-      addSurfaceLayer(app.metadata.surface_overlay);
+      setSurfaceLayers(app.metadata.hotspot_surface_overlay);
       renderLegend(false);
     } else {
       const changeProperty = `change_${interval}`;
@@ -382,7 +480,7 @@ function setInterval(interval) {
         ["boolean", ["feature-state", "hover"], false], 0.9,
         ["==", ["get", "feature_type"], "coldspot_patch"], 0.42,
         ["interpolate", ["linear"], ["coalesce", ["get", hotspotProperty], 0], 0, 0.2, 0.25, 0.52, 1, 0.82]]);
-      addSurfaceLayer(app.metadata.annual_overlays[interval]);
+      setSurfaceLayers(app.metadata.annual_overlays[interval]);
       renderLegend(true);
     }
   }
@@ -677,6 +775,8 @@ function bindEvents() {
     toggleBasemapMenu();
   });
   document.querySelectorAll(".basemap-option").forEach((button) => button.addEventListener("click", () => setBasemap(button.dataset.basemap)));
+  $("previousImageryYear").addEventListener("click", () => shiftImageryYear(-1));
+  $("nextImageryYear").addEventListener("click", () => shiftImageryYear(1));
   $("zoomIn").addEventListener("click", () => app.map.zoomIn()); $("zoomOut").addEventListener("click", () => app.map.zoomOut());
   $("locateMe").addEventListener("click", () => navigator.geolocation?.getCurrentPosition((position) => activateSearchResult({ name: "Current location", detail: "Browser location", center: [position.coords.longitude, position.coords.latitude] })));
   $("closeDetails").addEventListener("click", closeDetails);
@@ -732,6 +832,8 @@ async function initialize() {
     $("headerSummary").textContent = `${app.metadata.feature_count.toLocaleString()} regions · annual embedding, DEA and NDVI history`;
     $("hotspotCount").textContent = app.metadata.hotspot_feature_count.toLocaleString();
     $("coldspotCount").textContent = app.metadata.coldspot_feature_count.toLocaleString();
+    updateImageryYearControl();
+    updateMapStatus();
     bindEvents(); renderLegend(false); createMap();
   } catch (error) {
     $("mapLoading").innerHTML = `<strong>Map failed to start</strong><span>${escapeHtml(error.message)}</span>`;

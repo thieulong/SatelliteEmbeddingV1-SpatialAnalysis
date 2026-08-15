@@ -33,7 +33,8 @@
   "region_year_rows": 110272,
   "detail_shard_size": 1000,
   "detail_shard_count": 14,
-  "surface_overlay": "data/change_state_overlay.png",
+  "hotspot_surface_overlay": "data/change_hotspots_overlay.png",
+  "coldspot_surface_overlay": "data/change_coldspots_overlay.png",
   "annual_overlays": {
     "2017_2018": "data/annual_hotspot_2017_2018.png",
     "2018_2019": "data/annual_hotspot_2018_2019.png",

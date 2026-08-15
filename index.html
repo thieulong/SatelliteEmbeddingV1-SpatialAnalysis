@@ -83,21 +83,34 @@
       <div class="basemap-control">
         <div class="basemap-menu" id="basemapMenu" role="menu" aria-label="Choose map view" hidden>
           <span class="basemap-menu-title">Map view</span>
-          <button class="basemap-option active" type="button" data-basemap="satellite" role="menuitemradio" aria-checked="true">
+          <button class="basemap-option active" type="button" data-basemap="annual" role="menuitemradio" aria-checked="true">
+            <span class="basemap-preview annual-preview" aria-hidden="true"></span>
+            <span class="basemap-option-copy"><strong>Annual satellite</strong><small>2017–2025</small></span>
+            <i data-lucide="check"></i>
+          </button>
+          <button class="basemap-option" type="button" data-basemap="reference" role="menuitemradio" aria-checked="false">
             <span class="basemap-preview satellite-preview" aria-hidden="true"></span>
-            <span>Satellite</span>
+            <span class="basemap-option-copy"><strong>Satellite reference</strong><small>High-detail context</small></span>
             <i data-lucide="check"></i>
           </button>
           <button class="basemap-option" type="button" data-basemap="streets" role="menuitemradio" aria-checked="false">
             <span class="basemap-preview streets-preview" aria-hidden="true"></span>
-            <span>Map</span>
+            <span class="basemap-option-copy"><strong>Map</strong><small>Places and roads</small></span>
             <i data-lucide="check"></i>
           </button>
+          <p class="imagery-note">Annual imagery is a cloud-reduced Landsat composite for each calendar year, not a single-date photograph.</p>
         </div>
-        <button class="basemap-toggle" id="basemapToggle" type="button" aria-label="Choose map view. Satellite selected" aria-controls="basemapMenu" aria-expanded="false">
-          <i data-lucide="layers-3"></i>
-          <span>Layers</span>
-        </button>
+        <div class="basemap-actions">
+          <button class="basemap-toggle" id="basemapToggle" type="button" aria-label="Choose map view. Annual satellite selected" aria-controls="basemapMenu" aria-expanded="false">
+            <i data-lucide="layers-3"></i>
+            <span>Layers</span>
+          </button>
+          <div class="imagery-year-control" id="imageryYearControl" role="group" aria-label="Annual satellite imagery for 2024">
+            <button id="previousImageryYear" type="button" aria-label="Previous satellite imagery year" title="Previous imagery year"><i data-lucide="chevron-left"></i></button>
+            <div><small>Imagery</small><strong id="imageryYearValue">2024</strong></div>
+            <button id="nextImageryYear" type="button" aria-label="Next satellite imagery year" title="Next imagery year"><i data-lucide="chevron-right"></i></button>
+          </div>
+        </div>
       </div>
       <div class="map-toolbar">
         <button class="icon-button light" id="zoomIn" aria-label="Zoom in" title="Zoom in"><i data-lucide="plus"></i></button>
@@ -146,6 +159,7 @@
         <div><strong>DEA Land Cover</strong><p>Provides broad and detailed annual land-cover classes and the proportion of each region represented by the dominant class.</p></div>
         <div><strong>NDVI</strong><p>Measures vegetation greenness and indicates net greening, browning or no clear net change.</p></div>
         <div><strong>Complete regional history</strong><p>All 13,784 regions have annual records from 2017 to 2024. One small region has an unknown detailed DEA class in 2021.</p></div>
+        <div><strong>Annual satellite imagery</strong><p>DEA GeoMAD provides a cloud-reduced Landsat view for each year from 2017 to 2025 at 30 m resolution. It gives visual context, but does not prove the cause of a detected change.</p></div>
       </div>
     </dialog>
 
