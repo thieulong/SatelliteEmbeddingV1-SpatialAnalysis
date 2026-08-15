@@ -38,6 +38,22 @@
         <label class="check-row"><input type="checkbox" id="showColdspots" checked /><span class="swatch coldspot"></span><span>Low-change areas (cold spots)</span><small id="coldspotCount">—</small></label>
       </section>
 
+      <section class="filter-section land-transition-filter">
+        <div class="section-title"><span>Land-cover change</span><button class="help-tip" data-help="Uses the dominant DEA Level 3 land-cover class for each mapped region. The overview compares the first and final study years; selecting an annual period compares its two years. This is supporting land-cover evidence, not a cause assigned by the AI embedding." aria-label="Land-cover change explanation"><i data-lucide="circle-help"></i></button></div>
+        <select id="landTransition" aria-label="DEA land-cover change">
+          <option value="all">All land-cover outcomes</option>
+          <option value="any_change">Any broad-class change</option>
+          <option value="no_change">No broad-class change</option>
+          <option value="natural_to_cultivated">Natural → cultivated vegetation</option>
+          <option value="natural_to_artificial">Natural vegetation → artificial surface</option>
+          <option value="cultivated_to_natural">Cultivated → natural vegetation</option>
+          <option value="cultivated_to_artificial">Cultivated vegetation → artificial surface</option>
+          <option value="artificial_to_vegetation">Artificial surface → vegetation</option>
+          <option value="to_water_or_bare">Changed to water or bare surface</option>
+        </select>
+        <p class="transition-period"><span>DEA comparison</span><strong id="landTransitionPeriod">2017 → 2024</strong></p>
+      </section>
+
       <section class="filter-section">
         <div class="section-title"><span>Change pattern</span><button class="help-tip" data-help="This describes how much of the area changed strongly in two or more annual periods. Change mainly once: under 10%. Some repeated change: 10–49%. Widespread repeated change: at least 50%. Different cells may change in different years." aria-label="Change pattern explanation"><i data-lucide="circle-help"></i></button></div>
         <select id="changePattern">
