@@ -6,8 +6,8 @@ The published site is a static demonstration covering 2017 to 2024. Hot spots an
 
 The three map views are:
 
-- **Annual satellite:** Esri World Imagery Wayback archive releases for 2017–2025, with the actual local capture date and source resolution reported where available.
+- **Annual satellite:** the closest verified Esri World Imagery Wayback capture found among several nearby archive releases, with the actual date and source resolution reported.
 - **Satellite reference:** the latest Esri World Imagery basemap.
 - **Map:** OpenStreetMap places and roads.
 
-The Annual satellite year is the archive release year, not a guarantee that the source photograph was captured in that calendar year.
+Wayback does not provide uniform annual photography. AusHabitat checks multiple nearby archive releases and displays imagery only when a verified local capture falls within approximately 18 months of the selected year. Otherwise, the normal map remains visible and the interface reports that no suitable nearby-year image is available.

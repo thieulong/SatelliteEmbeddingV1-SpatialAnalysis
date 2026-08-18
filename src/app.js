@@ -42,6 +42,9 @@ const app = {
   imageryConfig: null,
   imageryMetadataRequest: 0,
   currentImageryMetadata: null,
+  activeImageryRelease: null,
+  imageryCandidateCache: new Map(),
+  imageryContextTimer: null,
   featureLookup: new Map(),
   shardCache: new Map(),
   selectedId: null,
@@ -54,7 +57,7 @@ const app = {
   helpAnchor: null,
   helpPinned: false,
   helpTimer: null,
-  basemap: "annual",
+  basemap: "streets",
   imageryYear: 2024,
 };
 
@@ -148,16 +151,18 @@ async function getDetail(featureId) {
   return app.shardCache.get(shard)[featureId];
 }
 
-function configuredImagery(year) {
-  return app.imageryConfig?.years?.[String(year)] || null;
+function configuredCandidateReleases(year) {
+  const releaseNumbers = app.imageryConfig?.years?.[String(year)] || [];
+  return releaseNumbers.map((releaseNum) => ({
+    releaseNum,
+    ...(app.imageryConfig?.releases?.[String(releaseNum)] || {}),
+  })).filter((release) => release.metadata_service);
 }
 
-function annualSatelliteSource(year) {
-  const configured = configuredImagery(year);
-  if (!configured) throw new Error(`Annual satellite imagery is not configured for ${year}.`);
+function annualSatelliteSource(releaseNum) {
   return {
     type: "raster",
-    tiles: [`https://wayback.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/WMTS/1.0.0/default028mm/MapServer/tile/${configured.release_num}/{z}/{y}/{x}`],
+    tiles: [`https://wayback.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/WMTS/1.0.0/default028mm/MapServer/tile/${releaseNum}/{z}/{y}/{x}`],
     tileSize: 256,
     minzoom: 0,
     maxzoom: 18,
@@ -195,111 +200,66 @@ function setImageryCaptureCard(label, value, state = "") {
   card.title = `${label}: ${value}`;
 }
 
-async function updateImageryContext() {
-  if (!app.map || app.basemap !== "annual") {
-    if ($("imageryCaptureCard")) $("imageryCaptureCard").hidden = true;
-    return;
-  }
-
-  const configured = configuredImagery(app.imageryYear);
-  if (!configured) return;
-  const requestId = ++app.imageryMetadataRequest;
-  const center = app.map.getCenter();
-  const releaseDate = formatCaptureDate(configured.release_date);
-  setImageryCaptureCard(`Archive released ${releaseDate}`, "Checking image capture at map centre…", "checking");
-
+async function lookupReleaseMetadata(release, center) {
+  const delta = 0.015;
+  const query = new URLSearchParams({
+    f: "json",
+    geometry: `${center.lng},${center.lat}`,
+    geometryType: "esriGeometryPoint",
+    sr: "4326",
+    layers: "all",
+    tolerance: "2",
+    mapExtent: `${center.lng - delta},${center.lat - delta},${center.lng + delta},${center.lat + delta}`,
+    imageDisplay: "1200,800,96",
+    returnGeometry: "false",
+  });
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 7000);
+  let results;
   try {
-    const delta = 0.015;
-    const query = new URLSearchParams({
-      f: "json",
-      geometry: `${center.lng},${center.lat}`,
-      geometryType: "esriGeometryPoint",
-      sr: "4326",
-      layers: "all",
-      tolerance: "2",
-      mapExtent: `${center.lng - delta},${center.lat - delta},${center.lng + delta},${center.lat + delta}`,
-      imageDisplay: "1200,800,96",
-      returnGeometry: "false",
+    const response = await fetch(`${release.metadata_service}/identify?${query}`, {
+      cache: "force-cache",
+      signal: controller.signal,
     });
-    const response = await fetch(`${configured.metadata_service}/identify?${query}`, { cache: "no-store" });
     if (!response.ok) throw new Error("Metadata unavailable");
-    const results = (await response.json()).results || [];
-    const unique = new Map();
-    results.forEach((result) => {
-      const attributes = result.attributes || {};
-      const key = [attributes.OBJECTID, attributes.SRC_DATE, attributes.SRC_RES, attributes.NICE_DESC].join("|");
-      unique.set(key, attributes);
-    });
-    const candidates = [...unique.values()].sort((left, right) => {
-      const orderDifference = Number(right.DrawOrder || 0) - Number(left.DrawOrder || 0);
-      if (orderDifference) return orderDifference;
-      return Number(left.SRC_RES || 9999) - Number(right.SRC_RES || 9999);
-    });
-    const selected = candidates[0];
-    if (!selected) throw new Error("No local capture metadata");
-    const selectedCaptureDate = captureDate(selected);
-    const captureYear = selectedCaptureDate ? Number(selectedCaptureDate.slice(0, 4)) : null;
-    const metadata = {
-      selectedYear: app.imageryYear,
-      captureDate: selectedCaptureDate,
-      matchesSelectedYear: captureYear === app.imageryYear,
-      sourceResolution: Number(selected.SRC_RES),
-      provider: selected.NICE_DESC || selected.NICE_NAME || null,
-    };
-    if (requestId !== app.imageryMetadataRequest || app.basemap !== "annual" || metadata.selectedYear !== app.imageryYear) return;
-    app.currentImageryMetadata = metadata;
-    const details = [
-      metadata.captureDate ? `Captured ${formatCaptureDate(metadata.captureDate)}` : "Capture date unavailable",
-      formatResolution(metadata.sourceResolution),
-      metadata.provider,
-    ].filter(Boolean).join(" · ");
-    const label = !metadata.captureDate
-      ? `Archive released ${releaseDate} · capture year unavailable`
-      : metadata.matchesSelectedYear
-        ? `Archive released ${releaseDate} · capture matches ${app.imageryYear}`
-        : `Archive released ${releaseDate} · image is not from ${app.imageryYear}`;
-    setImageryCaptureCard(label, details, metadata.matchesSelectedYear ? "" : "warning");
-    updateMapStatus();
-  } catch (_) {
-    if (requestId !== app.imageryMetadataRequest) return;
-    app.currentImageryMetadata = null;
-    setImageryCaptureCard(`Archive released ${releaseDate}`, "Local capture details unavailable", "warning");
-    updateMapStatus();
+    results = (await response.json()).results || [];
+  } finally {
+    window.clearTimeout(timeout);
   }
+  const unique = new Map();
+  results.forEach((result) => {
+    const attributes = result.attributes || {};
+    const key = [attributes.OBJECTID, attributes.SRC_DATE, attributes.SRC_RES, attributes.NICE_DESC].join("|");
+    unique.set(key, attributes);
+  });
+  const candidates = [...unique.values()].sort((left, right) => {
+    const orderDifference = Number(right.DrawOrder || 0) - Number(left.DrawOrder || 0);
+    if (orderDifference) return orderDifference;
+    return Number(left.SRC_RES || 9999) - Number(right.SRC_RES || 9999);
+  });
+  const selected = candidates[0];
+  const selectedCaptureDate = selected ? captureDate(selected) : null;
+  if (!selectedCaptureDate) return null;
+  return {
+    releaseNum: release.releaseNum,
+    releaseDate: release.release_date,
+    captureDate: selectedCaptureDate,
+    sourceResolution: Number(selected.SRC_RES),
+    provider: selected.NICE_DESC || selected.NICE_NAME || null,
+  };
 }
 
-function updateMapStatus() {
-  const analysis = app.interval === "endpoint" ? "2017–2024 overview" : `Change during ${INTERVAL_LABELS[app.interval]}`;
-  const imagery = app.basemap === "annual" ? app.currentImageryMetadata?.captureDate
-    ? `annual satellite · captured ${formatCaptureDate(app.currentImageryMetadata.captureDate)}`
-    : `annual satellite · archive ${app.imageryYear}`
-    : app.basemap === "reference" ? "satellite reference" : "street map";
-  $("mapStatus").textContent = `${analysis} · ${imagery}`;
+function setAnnualLayerAvailable(available) {
+  if (!app.map || app.basemap !== "annual") return;
+  if (app.map.getLayer("annual-satellite")) app.map.setLayoutProperty("annual-satellite", "visibility", available ? "visible" : "none");
+  if (app.map.getLayer("osm")) app.map.setLayoutProperty("osm", "visibility", available ? "none" : "visible");
 }
 
-function updateImageryYearControl() {
-  $("imageryYearValue").textContent = app.imageryYear;
-  $("previousImageryYear").disabled = app.imageryYear === IMAGERY_YEARS[0];
-  $("nextImageryYear").disabled = app.imageryYear === IMAGERY_YEARS.at(-1);
-  $("imageryYearControl").setAttribute("aria-label", `Annual satellite archive for ${app.imageryYear}`);
-}
-
-function setImageryYear(year) {
-  const nextYear = Math.max(IMAGERY_YEARS[0], Math.min(IMAGERY_YEARS.at(-1), Number(year)));
-  if (!IMAGERY_YEARS.includes(nextYear)) return;
-  const changed = nextYear !== app.imageryYear;
-  app.imageryYear = nextYear;
-  app.currentImageryMetadata = null;
-  updateImageryYearControl();
-  updateMapStatus();
-  if (!changed || !app.map?.isStyleLoaded()) {
-    updateImageryContext();
-    return;
-  }
-
+function setAnnualImageryRelease(releaseNum) {
+  if (!app.map || app.activeImageryRelease === releaseNum) return;
   if (app.map.getLayer("annual-satellite")) app.map.removeLayer("annual-satellite");
   if (app.map.getSource("annual-satellite")) app.map.removeSource("annual-satellite");
-  app.map.addSource("annual-satellite", annualSatelliteSource(nextYear));
+  app.map.addSource("annual-satellite", annualSatelliteSource(releaseNum));
   const beforeLayer = ["surface-cold-overlay", "surface-hotspot-overlay", "regions-fill"]
     .find((layerId) => app.map.getLayer(layerId));
   app.map.addLayer({
@@ -310,7 +270,125 @@ function setImageryYear(year) {
     maxzoom: 20,
     layout: { visibility: app.basemap === "annual" ? "visible" : "none" },
   }, beforeLayer);
-  updateImageryContext();
+  app.activeImageryRelease = releaseNum;
+}
+
+function applyImageryResult(result, requestId) {
+  if (requestId !== app.imageryMetadataRequest || app.basemap !== "annual" || result.selectedYear !== app.imageryYear) return;
+  app.currentImageryMetadata = result;
+  if (!result.available) {
+    setAnnualLayerAvailable(false);
+    const nearest = result.nearestCaptureDate
+      ? `Closest dated image was ${formatCaptureDate(result.nearestCaptureDate)}, outside the ±18-month limit.`
+      : "No dated high-detail image was found at the map centre.";
+    setImageryCaptureCard(`No nearby-year image for ${app.imageryYear}`, nearest, "warning");
+    updateMapStatus();
+    return;
+  }
+
+  setAnnualImageryRelease(result.releaseNum);
+  setAnnualLayerAvailable(true);
+  const details = [
+    `Captured ${formatCaptureDate(result.captureDate)}`,
+    formatResolution(result.sourceResolution),
+    result.provider,
+  ].filter(Boolean).join(" · ");
+  const captureYear = Number(result.captureDate.slice(0, 4));
+  const label = captureYear === app.imageryYear
+    ? `Best verified image near ${app.imageryYear} · same calendar year`
+    : `Best verified image near ${app.imageryYear} · captured in ${captureYear}`;
+  setImageryCaptureCard(label, details, captureYear === app.imageryYear ? "" : "warning");
+  updateMapStatus();
+}
+
+function imageryLookupPoint() {
+  if (app.selectedDetail) return { lng: app.selectedDetail.lon, lat: app.selectedDetail.lat };
+  if (app.selectedId) {
+    const selected = app.featureLookup.get(app.selectedId);
+    if (selected) return { lng: selected.lon, lat: selected.lat };
+  }
+  if (app.searchMarker) return app.searchMarker.getLngLat();
+  if (app.map.getZoom() < 10.5) {
+    const [west, south, east, north] = app.metadata.bounds;
+    return { lng: (west + east) / 2, lat: (south + north) / 2 };
+  }
+  return app.map.getCenter();
+}
+
+async function updateImageryContext() {
+  if (!app.map || app.basemap !== "annual") {
+    if ($("imageryCaptureCard")) $("imageryCaptureCard").hidden = true;
+    return;
+  }
+
+  const releases = configuredCandidateReleases(app.imageryYear);
+  const requestId = ++app.imageryMetadataRequest;
+  const center = imageryLookupPoint();
+  const cacheKey = `${app.imageryYear}:${center.lng.toFixed(3)}:${center.lat.toFixed(3)}`;
+  setAnnualLayerAvailable(false);
+  setImageryCaptureCard(`Finding imagery near ${app.imageryYear}`, "Checking local capture dates…", "checking");
+
+  if (app.imageryCandidateCache.has(cacheKey)) {
+    applyImageryResult(app.imageryCandidateCache.get(cacheKey), requestId);
+    return;
+  }
+
+  try {
+    const metadata = (await Promise.all(releases.map((release) => lookupReleaseMetadata(release, center).catch(() => null))))
+      .filter(Boolean);
+    const targetTime = Date.UTC(app.imageryYear, 6, 1);
+    metadata.forEach((item) => {
+      item.distanceDays = Math.abs(Date.parse(`${item.captureDate}T00:00:00Z`) - targetTime) / 86400000;
+    });
+    metadata.sort((left, right) => left.distanceDays - right.distanceDays || left.sourceResolution - right.sourceResolution);
+    const nearest = metadata[0] || null;
+    const maximumDistance = Number(app.imageryConfig.maximum_capture_distance_days || 548);
+    const result = nearest && nearest.distanceDays <= maximumDistance
+      ? { ...nearest, selectedYear: app.imageryYear, available: true }
+      : { selectedYear: app.imageryYear, available: false, nearestCaptureDate: nearest?.captureDate || null };
+    if (app.imageryCandidateCache.size >= 100) app.imageryCandidateCache.delete(app.imageryCandidateCache.keys().next().value);
+    app.imageryCandidateCache.set(cacheKey, result);
+    applyImageryResult(result, requestId);
+  } catch (_) {
+    if (requestId !== app.imageryMetadataRequest) return;
+    app.currentImageryMetadata = { selectedYear: app.imageryYear, available: false };
+    setAnnualLayerAvailable(false);
+    setImageryCaptureCard(`Imagery check failed for ${app.imageryYear}`, "Normal map shown instead. Try again after moving the map.", "warning");
+    updateMapStatus();
+  }
+}
+
+function scheduleImageryContext() {
+  if (app.imageryContextTimer) window.clearTimeout(app.imageryContextTimer);
+  app.imageryContextTimer = window.setTimeout(updateImageryContext, 350);
+}
+
+function updateMapStatus() {
+  const analysis = app.interval === "endpoint" ? "2017–2024 overview" : `Change during ${INTERVAL_LABELS[app.interval]}`;
+  const imagery = app.basemap === "annual" ? app.currentImageryMetadata?.available === false
+    ? `annual satellite · no nearby-year image for ${app.imageryYear}`
+    : app.currentImageryMetadata?.captureDate
+    ? `annual satellite · captured ${formatCaptureDate(app.currentImageryMetadata.captureDate)}`
+    : `annual satellite · finding ${app.imageryYear} image`
+    : app.basemap === "reference" ? "satellite reference" : "street map";
+  $("mapStatus").textContent = `${analysis} · ${imagery}`;
+}
+
+function updateImageryYearControl() {
+  $("imageryYearValue").textContent = app.imageryYear;
+  $("previousImageryYear").disabled = app.imageryYear === IMAGERY_YEARS[0];
+  $("nextImageryYear").disabled = app.imageryYear === IMAGERY_YEARS.at(-1);
+  $("imageryYearControl").setAttribute("aria-label", `Annual satellite imagery nearest ${app.imageryYear}`);
+}
+
+function setImageryYear(year) {
+  const nextYear = Math.max(IMAGERY_YEARS[0], Math.min(IMAGERY_YEARS.at(-1), Number(year)));
+  if (!IMAGERY_YEARS.includes(nextYear)) return;
+  app.imageryYear = nextYear;
+  app.currentImageryMetadata = null;
+  updateImageryYearControl();
+  updateMapStatus();
+  if (app.map) updateImageryContext();
 }
 
 function shiftImageryYear(direction) {
@@ -320,12 +398,14 @@ function shiftImageryYear(direction) {
 
 function createMap() {
   const [west, south, east, north] = app.metadata.bounds;
+  const initialRelease = configuredCandidateReleases(app.imageryYear)[0]?.releaseNum;
+  app.activeImageryRelease = initialRelease;
   app.map = new maplibregl.Map({
     container: "map",
     style: {
       version: 8,
       sources: {
-        "annual-satellite": annualSatelliteSource(app.imageryYear),
+        "annual-satellite": annualSatelliteSource(initialRelease),
         "reference-satellite": {
           type: "raster",
           tiles: ["https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"],
@@ -340,9 +420,9 @@ function createMap() {
         },
       },
       layers: [
-        { id: "annual-satellite", type: "raster", source: "annual-satellite", minzoom: 0, maxzoom: 20 },
+        { id: "annual-satellite", type: "raster", source: "annual-satellite", minzoom: 0, maxzoom: 20, layout: { visibility: "none" } },
         { id: "reference-satellite", type: "raster", source: "reference-satellite", minzoom: 0, maxzoom: 20, layout: { visibility: "none" } },
-        { id: "osm", type: "raster", source: "osm", minzoom: 0, maxzoom: 19, layout: { visibility: "none" } },
+        { id: "osm", type: "raster", source: "osm", minzoom: 0, maxzoom: 19 },
       ],
     },
     center: [(west + east) / 2, (south + north) / 2],
@@ -395,16 +475,16 @@ function createMap() {
     updateImageryContext();
     $("mapLoading").classList.add("hidden");
   });
-  app.map.on("moveend", () => updateImageryContext());
+  app.map.on("moveend", scheduleImageryContext);
 }
 
 function setBasemap(name) {
   const selected = BASEMAPS[name];
   if (!selected || !app.map) return;
   app.basemap = name;
-  Object.entries(BASEMAPS).forEach(([key, item]) => {
-    app.map.setLayoutProperty(item.layer, "visibility", key === name ? "visible" : "none");
-  });
+  Object.values(BASEMAPS).forEach((item) => app.map.setLayoutProperty(item.layer, "visibility", "none"));
+  if (name === "annual") app.map.setLayoutProperty("osm", "visibility", "visible");
+  else app.map.setLayoutProperty(selected.layer, "visibility", "visible");
   document.querySelectorAll(".basemap-option").forEach((button) => {
     const active = button.dataset.basemap === name;
     button.classList.toggle("active", active);

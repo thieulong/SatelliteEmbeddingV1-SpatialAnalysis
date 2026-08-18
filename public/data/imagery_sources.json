@@ -1,15 +1,34 @@
 {
-  "schema_version": 1,
-  "description": "Esri World Imagery Wayback releases used by the Annual satellite map view.",
+  "schema_version": 2,
+  "description": "Candidate Esri World Imagery Wayback releases used to find the closest local capture to each selected year.",
+  "maximum_capture_distance_days": 548,
   "years": {
-    "2017": { "release_num": 25521, "release_date": "2017-11-16", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2017_r19/MapServer" },
-    "2018": { "release_num": 23448, "release_date": "2018-12-14", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2018_r17/MapServer" },
-    "2019": { "release_num": 4756, "release_date": "2019-12-12", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2019_r16/MapServer" },
-    "2020": { "release_num": 29260, "release_date": "2020-12-16", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2020_r16/MapServer" },
-    "2021": { "release_num": 26120, "release_date": "2021-12-21", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2021_r17/MapServer" },
-    "2022": { "release_num": 45134, "release_date": "2022-12-14", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2022_r15/MapServer" },
-    "2023": { "release_num": 56102, "release_date": "2023-12-07", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2023_r11/MapServer" },
-    "2024": { "release_num": 16453, "release_date": "2024-12-12", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2024_r13/MapServer" },
-    "2025": { "release_num": 13192, "release_date": "2025-12-18", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2025_r12/MapServer" }
+    "2017": [25521, 23448, 4756],
+    "2018": [23448, 4756, 21485],
+    "2019": [4756, 21485, 15423],
+    "2020": [29260, 15423, 4905],
+    "2021": [26120, 4905, 47963],
+    "2022": [45134, 47963, 12428],
+    "2023": [56102, 12428, 20512],
+    "2024": [16453, 20512, 13192],
+    "2025": [20512, 13192, 10842]
+  },
+  "releases": {
+    "25521": { "release_date": "2017-11-16", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2017_r19/MapServer" },
+    "23448": { "release_date": "2018-12-14", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2018_r17/MapServer" },
+    "4756": { "release_date": "2019-12-12", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2019_r16/MapServer" },
+    "21485": { "release_date": "2020-01-30", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2020_r02/MapServer" },
+    "29260": { "release_date": "2020-12-16", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2020_r16/MapServer" },
+    "15423": { "release_date": "2021-05-19", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2021_r07/MapServer" },
+    "26120": { "release_date": "2021-12-21", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2021_r17/MapServer" },
+    "4905": { "release_date": "2022-06-29", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2022_r08/MapServer" },
+    "45134": { "release_date": "2022-12-14", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2022_r15/MapServer" },
+    "47963": { "release_date": "2023-06-29", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2023_r06/MapServer" },
+    "56102": { "release_date": "2023-12-07", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2023_r11/MapServer" },
+    "12428": { "release_date": "2024-06-06", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2024_r06/MapServer" },
+    "16453": { "release_date": "2024-12-12", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2024_r13/MapServer" },
+    "20512": { "release_date": "2025-10-23", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2025_r10/MapServer" },
+    "13192": { "release_date": "2025-12-18", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2025_r12/MapServer" },
+    "10842": { "release_date": "2026-05-28", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2026_r05/MapServer" }
   }
 }
