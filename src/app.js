@@ -294,10 +294,12 @@ function applyImageryResult(result, requestId) {
     result.provider,
   ].filter(Boolean).join(" · ");
   const captureYear = Number(result.captureDate.slice(0, 4));
-  const label = captureYear === app.imageryYear
+  const label = result.provisional
+    ? `Verified image near ${app.imageryYear} · checking for a closer capture`
+    : captureYear === app.imageryYear
     ? `Best verified image near ${app.imageryYear} · same calendar year`
     : `Best verified image near ${app.imageryYear} · captured in ${captureYear}`;
-  setImageryCaptureCard(label, details, captureYear === app.imageryYear ? "" : "warning");
+  setImageryCaptureCard(label, details, result.provisional ? "checking" : captureYear === app.imageryYear ? "" : "warning");
   updateMapStatus();
 }
 
@@ -334,15 +336,21 @@ async function updateImageryContext() {
   }
 
   try {
-    const metadata = (await Promise.all(releases.map((release) => lookupReleaseMetadata(release, center).catch(() => null))))
-      .filter(Boolean);
     const targetTime = Date.UTC(app.imageryYear, 6, 1);
-    metadata.forEach((item) => {
+    const maximumDistance = Number(app.imageryConfig.maximum_capture_distance_days || 548);
+    let provisionalApplied = false;
+    const metadata = (await Promise.all(releases.map(async (release) => {
+      const item = await lookupReleaseMetadata(release, center).catch(() => null);
+      if (!item) return null;
       item.distanceDays = Math.abs(Date.parse(`${item.captureDate}T00:00:00Z`) - targetTime) / 86400000;
-    });
+      if (!provisionalApplied && item.distanceDays <= maximumDistance) {
+        provisionalApplied = true;
+        applyImageryResult({ ...item, selectedYear: app.imageryYear, available: true, provisional: true }, requestId);
+      }
+      return item;
+    }))).filter(Boolean);
     metadata.sort((left, right) => left.distanceDays - right.distanceDays || left.sourceResolution - right.sourceResolution);
     const nearest = metadata[0] || null;
-    const maximumDistance = Number(app.imageryConfig.maximum_capture_distance_days || 548);
     const result = nearest && nearest.distanceDays <= maximumDistance
       ? { ...nearest, selectedYear: app.imageryYear, available: true }
       : { selectedYear: app.imageryYear, available: false, nearestCaptureDate: nearest?.captureDate || null };
