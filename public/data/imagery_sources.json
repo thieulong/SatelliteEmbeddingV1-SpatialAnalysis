@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "description": "Esri World Imagery Wayback releases used by the Annual satellite map view.",
+  "years": {
+    "2017": { "release_num": 25521, "release_date": "2017-11-16", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2017_r19/MapServer" },
+    "2018": { "release_num": 23448, "release_date": "2018-12-14", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2018_r17/MapServer" },
+    "2019": { "release_num": 4756, "release_date": "2019-12-12", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2019_r16/MapServer" },
+    "2020": { "release_num": 29260, "release_date": "2020-12-16", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2020_r16/MapServer" },
+    "2021": { "release_num": 26120, "release_date": "2021-12-21", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2021_r17/MapServer" },
+    "2022": { "release_num": 45134, "release_date": "2022-12-14", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2022_r15/MapServer" },
+    "2023": { "release_num": 56102, "release_date": "2023-12-07", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2023_r11/MapServer" },
+    "2024": { "release_num": 16453, "release_date": "2024-12-12", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2024_r13/MapServer" },
+    "2025": { "release_num": 13192, "release_date": "2025-12-18", "metadata_service": "https://metadata.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Metadata_2025_r12/MapServer" }
+  }
+}

@@ -39,6 +39,9 @@ const app = {
   map: null,
   metadata: null,
   features: null,
+  imageryConfig: null,
+  imageryMetadataRequest: 0,
+  currentImageryMetadata: null,
   featureLookup: new Map(),
   shardCache: new Map(),
   selectedId: null,
@@ -120,12 +123,17 @@ function hideHelpPopover(force = false) {
 }
 
 async function loadData() {
-  const [metadataResponse, featureResponse] = await Promise.all([
+  const [metadataResponse, featureResponse, imageryResponse] = await Promise.all([
     fetch(`${DATA_ROOT}/app_metadata.json`),
     fetch(`${DATA_ROOT}/features.geojson`),
+    fetch(`${DATA_ROOT}/imagery_sources.json`),
   ]);
-  if (!metadataResponse.ok || !featureResponse.ok) throw new Error("The AusHabitat map package could not be loaded.");
-  [app.metadata, app.features] = await Promise.all([metadataResponse.json(), featureResponse.json()]);
+  if (!metadataResponse.ok || !featureResponse.ok || !imageryResponse.ok) throw new Error("The AusHabitat map package could not be loaded.");
+  [app.metadata, app.features, app.imageryConfig] = await Promise.all([
+    metadataResponse.json(),
+    featureResponse.json(),
+    imageryResponse.json(),
+  ]);
   app.featureLookup = new Map(app.features.features.map((feature) => [feature.properties.feature_id, feature.properties]));
 }
 
@@ -140,34 +148,131 @@ async function getDetail(featureId) {
   return app.shardCache.get(shard)[featureId];
 }
 
+function configuredImagery(year) {
+  return app.imageryConfig?.years?.[String(year)] || null;
+}
+
 function annualSatelliteSource(year) {
-  const base = "https://ows.dea.ga.gov.au/wms";
-  const query = [
-    "service=WMS",
-    "version=1.1.1",
-    "request=GetMap",
-    "layers=ga_ls8cls9c_gm_cyear_3",
-    "styles=simple_rgb",
-    "format=image%2Fpng",
-    "transparent=false",
-    "height=256",
-    "width=256",
-    "srs=EPSG%3A3857",
-    `time=${year}-01-01`,
-    "bbox={bbox-epsg-3857}",
-  ].join("&");
+  const configured = configuredImagery(year);
+  if (!configured) throw new Error(`Annual satellite imagery is not configured for ${year}.`);
   return {
     type: "raster",
-    tiles: [`${base}?${query}`],
+    tiles: [`https://wayback.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/WMTS/1.0.0/default028mm/MapServer/tile/${configured.release_num}/{z}/{y}/{x}`],
     tileSize: 256,
-    maxzoom: 14,
-    attribution: '<a href="https://knowledge.dea.ga.gov.au/data/product/dea-geometric-median-and-median-absolute-deviation-landsat/" target="_blank" rel="noopener">DEA GeoMAD</a> · Geoscience Australia',
+    minzoom: 0,
+    maxzoom: 18,
+    attribution: '<a href="https://livingatlas.arcgis.com/wayback/" target="_blank" rel="noopener">Esri World Imagery Wayback</a>',
   };
+}
+
+function formatCaptureDate(value) {
+  if (!value) return null;
+  const date = new Date(`${value}T00:00:00Z`);
+  return new Intl.DateTimeFormat(undefined, {
+    day: "numeric", month: "short", year: "numeric", timeZone: "UTC",
+  }).format(date);
+}
+
+function formatResolution(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return null;
+  return `${number < 1 ? number.toFixed(2) : number.toFixed(1)} m`;
+}
+
+function captureDate(attributes) {
+  const raw = String(attributes.SRC_DATE || "");
+  if (!/^\d{8}$/.test(raw)) return null;
+  return `${raw.slice(0, 4)}-${raw.slice(4, 6)}-${raw.slice(6, 8)}`;
+}
+
+function setImageryCaptureCard(label, value, state = "") {
+  const card = $("imageryCaptureCard");
+  card.hidden = false;
+  card.classList.remove("checking", "warning");
+  if (state) card.classList.add(state);
+  $("imageryCaptureLabel").textContent = label;
+  $("imageryCaptureValue").textContent = value;
+  card.title = `${label}: ${value}`;
+}
+
+async function updateImageryContext() {
+  if (!app.map || app.basemap !== "annual") {
+    if ($("imageryCaptureCard")) $("imageryCaptureCard").hidden = true;
+    return;
+  }
+
+  const configured = configuredImagery(app.imageryYear);
+  if (!configured) return;
+  const requestId = ++app.imageryMetadataRequest;
+  const center = app.map.getCenter();
+  const releaseDate = formatCaptureDate(configured.release_date);
+  setImageryCaptureCard(`Archive released ${releaseDate}`, "Checking image capture at map centre…", "checking");
+
+  try {
+    const delta = 0.015;
+    const query = new URLSearchParams({
+      f: "json",
+      geometry: `${center.lng},${center.lat}`,
+      geometryType: "esriGeometryPoint",
+      sr: "4326",
+      layers: "all",
+      tolerance: "2",
+      mapExtent: `${center.lng - delta},${center.lat - delta},${center.lng + delta},${center.lat + delta}`,
+      imageDisplay: "1200,800,96",
+      returnGeometry: "false",
+    });
+    const response = await fetch(`${configured.metadata_service}/identify?${query}`, { cache: "no-store" });
+    if (!response.ok) throw new Error("Metadata unavailable");
+    const results = (await response.json()).results || [];
+    const unique = new Map();
+    results.forEach((result) => {
+      const attributes = result.attributes || {};
+      const key = [attributes.OBJECTID, attributes.SRC_DATE, attributes.SRC_RES, attributes.NICE_DESC].join("|");
+      unique.set(key, attributes);
+    });
+    const candidates = [...unique.values()].sort((left, right) => {
+      const orderDifference = Number(right.DrawOrder || 0) - Number(left.DrawOrder || 0);
+      if (orderDifference) return orderDifference;
+      return Number(left.SRC_RES || 9999) - Number(right.SRC_RES || 9999);
+    });
+    const selected = candidates[0];
+    if (!selected) throw new Error("No local capture metadata");
+    const selectedCaptureDate = captureDate(selected);
+    const captureYear = selectedCaptureDate ? Number(selectedCaptureDate.slice(0, 4)) : null;
+    const metadata = {
+      selectedYear: app.imageryYear,
+      captureDate: selectedCaptureDate,
+      matchesSelectedYear: captureYear === app.imageryYear,
+      sourceResolution: Number(selected.SRC_RES),
+      provider: selected.NICE_DESC || selected.NICE_NAME || null,
+    };
+    if (requestId !== app.imageryMetadataRequest || app.basemap !== "annual" || metadata.selectedYear !== app.imageryYear) return;
+    app.currentImageryMetadata = metadata;
+    const details = [
+      metadata.captureDate ? `Captured ${formatCaptureDate(metadata.captureDate)}` : "Capture date unavailable",
+      formatResolution(metadata.sourceResolution),
+      metadata.provider,
+    ].filter(Boolean).join(" · ");
+    const label = !metadata.captureDate
+      ? `Archive released ${releaseDate} · capture year unavailable`
+      : metadata.matchesSelectedYear
+        ? `Archive released ${releaseDate} · capture matches ${app.imageryYear}`
+        : `Archive released ${releaseDate} · image is not from ${app.imageryYear}`;
+    setImageryCaptureCard(label, details, metadata.matchesSelectedYear ? "" : "warning");
+    updateMapStatus();
+  } catch (_) {
+    if (requestId !== app.imageryMetadataRequest) return;
+    app.currentImageryMetadata = null;
+    setImageryCaptureCard(`Archive released ${releaseDate}`, "Local capture details unavailable", "warning");
+    updateMapStatus();
+  }
 }
 
 function updateMapStatus() {
   const analysis = app.interval === "endpoint" ? "2017–2024 overview" : `Change during ${INTERVAL_LABELS[app.interval]}`;
-  const imagery = app.basemap === "annual" ? `annual satellite ${app.imageryYear}`
+  const imagery = app.basemap === "annual" ? app.currentImageryMetadata?.captureDate
+    ? `annual satellite · captured ${formatCaptureDate(app.currentImageryMetadata.captureDate)}`
+    : `annual satellite · archive ${app.imageryYear}`
     : app.basemap === "reference" ? "satellite reference" : "street map";
   $("mapStatus").textContent = `${analysis} · ${imagery}`;
 }
@@ -176,7 +281,7 @@ function updateImageryYearControl() {
   $("imageryYearValue").textContent = app.imageryYear;
   $("previousImageryYear").disabled = app.imageryYear === IMAGERY_YEARS[0];
   $("nextImageryYear").disabled = app.imageryYear === IMAGERY_YEARS.at(-1);
-  $("imageryYearControl").setAttribute("aria-label", `Annual satellite imagery for ${app.imageryYear}`);
+  $("imageryYearControl").setAttribute("aria-label", `Annual satellite archive for ${app.imageryYear}`);
 }
 
 function setImageryYear(year) {
@@ -184,9 +289,13 @@ function setImageryYear(year) {
   if (!IMAGERY_YEARS.includes(nextYear)) return;
   const changed = nextYear !== app.imageryYear;
   app.imageryYear = nextYear;
+  app.currentImageryMetadata = null;
   updateImageryYearControl();
   updateMapStatus();
-  if (!changed || !app.map?.isStyleLoaded()) return;
+  if (!changed || !app.map?.isStyleLoaded()) {
+    updateImageryContext();
+    return;
+  }
 
   if (app.map.getLayer("annual-satellite")) app.map.removeLayer("annual-satellite");
   if (app.map.getSource("annual-satellite")) app.map.removeSource("annual-satellite");
@@ -201,6 +310,7 @@ function setImageryYear(year) {
     maxzoom: 20,
     layout: { visibility: app.basemap === "annual" ? "visible" : "none" },
   }, beforeLayer);
+  updateImageryContext();
 }
 
 function shiftImageryYear(direction) {
@@ -238,7 +348,7 @@ function createMap() {
     center: [(west + east) / 2, (south + north) / 2],
     zoom: 8.7,
     minZoom: 7.7,
-    maxZoom: 17,
+    maxZoom: 20,
     attributionControl: false,
   });
   app.map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
@@ -282,8 +392,10 @@ function createMap() {
     });
     fitBounds();
     applyFilters();
+    updateImageryContext();
     $("mapLoading").classList.add("hidden");
   });
+  app.map.on("moveend", () => updateImageryContext());
 }
 
 function setBasemap(name) {
@@ -301,7 +413,9 @@ function setBasemap(name) {
   const toggle = $("basemapToggle");
   toggle.setAttribute("aria-label", `Choose map view. ${selected.label} selected`);
   $("imageryYearControl").hidden = name !== "annual";
+  $("imageryCaptureCard").hidden = name !== "annual";
   updateMapStatus();
+  updateImageryContext();
   closeBasemapMenu();
 }
 

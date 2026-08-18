@@ -85,7 +85,7 @@
           <span class="basemap-menu-title">Map view</span>
           <button class="basemap-option active" type="button" data-basemap="annual" role="menuitemradio" aria-checked="true">
             <span class="basemap-preview annual-preview" aria-hidden="true"></span>
-            <span class="basemap-option-copy"><strong>Annual satellite</strong><small>2017–2025</small></span>
+            <span class="basemap-option-copy"><strong>Annual satellite</strong><small>High detail · capture date shown</small></span>
             <i data-lucide="check"></i>
           </button>
           <button class="basemap-option" type="button" data-basemap="reference" role="menuitemradio" aria-checked="false">
@@ -98,7 +98,7 @@
             <span class="basemap-option-copy"><strong>Map</strong><small>Places and roads</small></span>
             <i data-lucide="check"></i>
           </button>
-          <p class="imagery-note">Annual imagery is a cloud-reduced Landsat composite for each calendar year, not a single-date photograph.</p>
+          <p class="imagery-note">Annual satellite uses archived Esri basemap releases. The actual local capture date is shown because an archive year can reuse older imagery.</p>
         </div>
         <div class="basemap-actions">
           <button class="basemap-toggle" id="basemapToggle" type="button" aria-label="Choose map view. Annual satellite selected" aria-controls="basemapMenu" aria-expanded="false">
@@ -109,6 +109,10 @@
             <button id="previousImageryYear" type="button" aria-label="Previous satellite imagery year" title="Previous imagery year"><i data-lucide="chevron-left"></i></button>
             <div><small>Imagery</small><strong id="imageryYearValue">2024</strong></div>
             <button id="nextImageryYear" type="button" aria-label="Next satellite imagery year" title="Next imagery year"><i data-lucide="chevron-right"></i></button>
+          </div>
+          <div class="imagery-capture-card checking" id="imageryCaptureCard" aria-live="polite">
+            <small id="imageryCaptureLabel">Annual satellite</small>
+            <strong id="imageryCaptureValue">Checking local capture…</strong>
           </div>
         </div>
       </div>
@@ -159,7 +163,7 @@
         <div><strong>DEA Land Cover</strong><p>Provides broad and detailed annual land-cover classes and the proportion of each region represented by the dominant class.</p></div>
         <div><strong>NDVI</strong><p>Measures vegetation greenness and indicates net greening, browning or no clear net change.</p></div>
         <div><strong>Complete regional history</strong><p>All 13,784 regions have annual records from 2017 to 2024. One small region has an unknown detailed DEA class in 2021.</p></div>
-        <div><strong>Annual satellite imagery</strong><p>DEA GeoMAD provides a cloud-reduced Landsat view for each year from 2017 to 2025 at 30 m resolution. It gives visual context, but does not prove the cause of a detected change.</p></div>
+        <div><strong>Annual satellite imagery</strong><p>Esri World Imagery Wayback provides a high-detail archived basemap release for each selected year. An archive can contain imagery captured earlier, so the map reports the actual local capture date and resolution where available.</p></div>
       </div>
     </dialog>
 
