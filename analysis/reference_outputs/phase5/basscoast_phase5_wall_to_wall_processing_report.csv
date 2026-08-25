@@ -1,0 +1,21 @@
+item,value
+project_folder,GEE_BassCoast_Data
+output_dir,BassCoast_Phase5_WallToWall_DEA_Summary_outputs
+reference_raster,GEE_BassCoast_Data/basscoast_endpoint_change_2017_2024.tif
+reference_crs,EPSG:4326
+reference_width,15586
+reference_height,12269
+window_size,512
+window_start,0
+windows_planned,744
+max_windows,0
+thresholds,"{""abs_slope_p25"": 0.0025544192176312, ""endpoint_p25"": 0.2292767912149429, ""endpoint_p95"": 0.4451330006122589, ""slope_p05"": -0.015400705859065, ""slope_p95"": 0.0187615677714347, ""variance_p25"": 0.0011392651358619, ""variance_p95"": 0.0084274113178253}"
+dea_mode,remote_dea_cog
+notes,DEA 30 m labels are nearest-neighbour resampled to the embedding raster grid for category summaries.
+generated_at,2026-06-29T04:00:41
+category_summary_csv,BassCoast_Phase5_WallToWall_DEA_Summary_outputs/basscoast_phase5_wall_to_wall_category_summary.csv
+level3_transition_counts_csv,BassCoast_Phase5_WallToWall_DEA_Summary_outputs/basscoast_phase5_wall_to_wall_level3_transition_counts.csv
+level4_transition_counts_csv,BassCoast_Phase5_WallToWall_DEA_Summary_outputs/basscoast_phase5_wall_to_wall_level4_transition_counts.csv
+sequence_type_counts_csv,BassCoast_Phase5_WallToWall_DEA_Summary_outputs/basscoast_phase5_wall_to_wall_sequence_type_counts.csv
+timing_alignment_csv,BassCoast_Phase5_WallToWall_DEA_Summary_outputs/basscoast_phase5_wall_to_wall_timing_alignment.csv
+pixel_area_m2,

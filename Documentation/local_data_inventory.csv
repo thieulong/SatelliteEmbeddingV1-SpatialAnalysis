@@ -1,0 +1,9 @@
+directory,approximate_size,status,purpose
+GEE_BassCoast_Data,4.1 GB,local_only_essential,Authoritative 10 m embedding metric rasters and Earth Engine exports
+BassCoast_Phase2_Pixel_Sampling_outputs,26 MB,local_only_essential,Full 89707-point sample and 900-point review subset
+BassCoast_Phase3_DEA_LandCover_Pipeline_outputs_full_sample,2.4 GB,local_only_preserve,Completed sampled DEA enrichment and checkpoints
+BassCoast_Phase5_WallToWall_DEA_Summary_outputs,69 MB,local_only_preserve,Complete-raster DEA category summaries
+BassCoast_Phase8_NDVI_Pilot_outputs,7.7 MB,local_only_preserve,900-point NDVI pilot outputs
+BassCoast_Phase9_Map_Data_Preparation_outputs,554 MB,local_only_essential,30 m state raster and interaction geometry
+BassCoast_Phase10_WallToWall_Context_outputs,747 MB,local_only_essential,Aligned annual DEA and NDVI rasters plus region histories
+AusHabitat_Sentinel2_Annual,4.8 GB,local_only_optional,Nine annual 10 m true-colour visual exports for 2017-2025

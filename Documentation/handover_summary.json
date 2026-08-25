@@ -1,0 +1,62 @@
+{
+  "status_date": "2026-08-25",
+  "project": "AusHabitat",
+  "study_area": "Bass Coast, Victoria, Australia",
+  "analysis_years": [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+  "published_app": "https://thieulong.github.io/SatelliteEmbeddingV1-SpatialAnalysis/",
+  "source_grid": {
+    "approximate_resolution_m": 10,
+    "width": 15586,
+    "height": 12269,
+    "cell_count": 191224634,
+    "finite_endpoint_cells": 83045578
+  },
+  "common_support_grid": {
+    "approximate_resolution_m": 30,
+    "width": 5196,
+    "height": 4090,
+    "cell_count": 21251640,
+    "finite_cells": 9267716
+  },
+  "sampling": {
+    "phase2_points": 89707,
+    "phase2b_review_points": 900,
+    "random_seed": 42,
+    "max_points_per_category": 10000
+  },
+  "regions": {
+    "total": 13784,
+    "change_regions": 13477,
+    "low_change_reference_regions": 307,
+    "region_year_rows": 110272
+  },
+  "thresholds": {
+    "annual_hotspot": 0.45,
+    "endpoint_p95": 0.4451330006122589,
+    "endpoint_p25": 0.2292767912149429,
+    "variance_p95": 0.0084274113178253,
+    "variance_p25": 0.0011392651358619,
+    "slope_p95": 0.0187615677714347,
+    "slope_p05": -0.015400705859065,
+    "abs_slope_p25": 0.0025544192176312,
+    "ndvi_review_interval_event": 0.07577809044942273,
+    "ndvi_region_event": 0.05270013838570708
+  },
+  "primary_context": [
+    "DEA Land Cover Level 3",
+    "DEA Land Cover Level 4",
+    "DEA GeoMAD NDVI"
+  ],
+  "optional_or_research_only": [
+    "Esri Annual Land Cover cross-check",
+    "Esri World Imagery Wayback visual context",
+    "local annual Sentinel-2 true-colour exports"
+  ],
+  "critical_boundaries": [
+    "Embedding hot spots indicate strong change magnitude, not causal land-change classes.",
+    "DEA and NDVI agreement is supporting evidence, not model accuracy.",
+    "The 89707-point table is category-balanced and not area-weighted.",
+    "The 30 m integrated grid does not replace the authoritative 10 m embedding rasters.",
+    "The original Earth Engine embedding source script must still be exported and versioned."
+  ]
+}

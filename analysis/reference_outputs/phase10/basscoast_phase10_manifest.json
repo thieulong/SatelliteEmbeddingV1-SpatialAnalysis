@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-08-05T01:30:09",
+  "grid": {
+    "width": 5196,
+    "height": 4090,
+    "crs": "EPSG:4326",
+    "bounds": [
+      144.89996212751865,
+      -39.20211967286227,
+      146.30007632934735,
+      -38.09997665077603
+    ],
+    "approximate_resolution_m": 30
+  },
+  "years": [
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "region_count": 13784,
+  "region_year_rows": 110272,
+  "ndvi_product": "ga_ls8cls9c_gm_cyear_3",
+  "ndvi_event_threshold": 0.05270013838570708,
+  "pixel_history_note": "Annual DEA Level 3, Level 4, NDVI and clear-observation COGs are aligned to the Phase 9 30 m grid."
+}

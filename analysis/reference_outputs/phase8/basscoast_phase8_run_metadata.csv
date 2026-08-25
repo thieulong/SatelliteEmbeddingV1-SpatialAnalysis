@@ -1,0 +1,7 @@
+item,value
+ndvi_event_threshold,0.07577809044942273
+source_product,ga_ls8cls9c_gm_cyear_3
+source_resolution_m,30
+review_points,900
+point_year_rows,7200
+point_interval_rows,6300

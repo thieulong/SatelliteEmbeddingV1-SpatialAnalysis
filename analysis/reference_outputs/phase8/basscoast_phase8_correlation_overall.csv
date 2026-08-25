@@ -1,0 +1,2 @@
+interval_count,point_count,pearson_r,spearman_rho,group_type,group,spearman_cluster_bootstrap_ci_low,spearman_cluster_bootstrap_ci_high
+6300,900,0.6227799785772491,0.5744244926333988,overall,all_valid_intervals,0.551815760683494,0.5987543974494992

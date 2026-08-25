@@ -1,0 +1,5 @@
+dea_family_changed,esri_family_changed,family_change_status_comparison,review_point_count
+False,False,both_stable,801
+False,True,esri_only_changed,33
+True,False,dea_only_changed,34
+True,True,both_changed,32

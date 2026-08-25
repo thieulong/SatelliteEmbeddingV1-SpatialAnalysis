@@ -1,0 +1,6 @@
+event_comparison,interval_count,share_of_all_intervals
+both,1221,0.19380952380952382
+embedding_only,342,0.054285714285714284
+ndvi_only,1561,0.2477777777777778
+neither,3176,0.5041269841269841
+invalid_ndvi,0,0.0

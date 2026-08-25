@@ -1,0 +1,13 @@
+PHASE 1 RASTER INSPECTION SUMMARY
+==========================================
+Generated at: 2026-05-16T07:39:20
+Project folder: /content/drive/MyDrive/GEE_BassCoast_SatelliteEmbedding
+Output folder: /content/drive/MyDrive/GEE_BassCoast_SatelliteEmbedding/BassCoast_Phase1_Raster_Inspection_outputs
+Core rasters loaded: 12 / 12
+Annual change rasters loaded: 7 / 7
+Annual hotspot rasters loaded: 7 / 7
+CSV tables loaded: 3
+Alignment passed: True
+
+Issues needing attention:
+- None

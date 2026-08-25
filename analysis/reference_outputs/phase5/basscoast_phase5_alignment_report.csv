@@ -1,0 +1,8 @@
+raster,path,crs_matches,transform_matches,width_matches,height_matches,dtype,nodata
+endpoint_change,GEE_BassCoast_Data/basscoast_endpoint_change_2017_2024.tif,True,True,True,True,float32,
+endpoint_hotspots,GEE_BassCoast_Data/basscoast_endpoint_hotspots_2017_2024.tif,True,True,True,True,uint8,
+persistence_count,GEE_BassCoast_Data/basscoast_persistence_count.tif,True,True,True,True,int16,
+variance_annual_change,GEE_BassCoast_Data/basscoast_variance_annual_change.tif,True,True,True,True,float32,
+slope_annual_change,GEE_BassCoast_Data/basscoast_slope_annual_change.tif,True,True,True,True,float32,
+first_hotspot_year,GEE_BassCoast_Data/basscoast_first_hotspot_year.tif,True,True,True,True,int16,
+max_change_year,GEE_BassCoast_Data/basscoast_max_change_year.tif,True,True,True,True,int16,

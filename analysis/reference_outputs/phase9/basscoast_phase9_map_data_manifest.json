@@ -1,0 +1,76 @@
+{
+  "package": "Bass Coast map data preparation",
+  "source_grid": {
+    "width": 15586,
+    "height": 12269,
+    "approximate_resolution_m": 10,
+    "cell_count": 191224634,
+    "finite_cell_count": 83045578,
+    "implicit_non_data_cell_count": 108179056,
+    "authoritative_raster_folder": "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/GEE_BassCoast_Data"
+  },
+  "common_support_grid": {
+    "width": 5196,
+    "height": 4090,
+    "approximate_resolution_m": 30,
+    "cell_count": 21251640,
+    "crs": "EPSG:4326",
+    "bounds": [
+      144.89996212751865,
+      -39.20211967286227,
+      146.30007632934735,
+      -38.09997665077603
+    ]
+  },
+  "state_codes": {
+    "0": "no_data",
+    "1": "cold",
+    "2": "background",
+    "3": "episodic_hotspot",
+    "4": "persistent_hotspot"
+  },
+  "thresholds": {
+    "endpoint_p95": 0.4451330006122589,
+    "endpoint_p25": 0.2292767912149429,
+    "variance_p95": 0.0084274113178253,
+    "variance_p25": 0.0011392651358619,
+    "slope_p95": 0.0187615677714347,
+    "slope_p05": -0.015400705859065,
+    "abs_slope_p25": 0.0025544192176312
+  },
+  "interaction_features": {
+    "count": 13784,
+    "hotspot_patch_count": 13477,
+    "coldspot_patch_count": 307,
+    "minimum_hot_cells_30m": 9,
+    "minimum_cold_cells_30m": 100,
+    "note": "Feature thresholds affect only interaction polygons. The complete hot and cold surface remains in the raster."
+  },
+  "rasters": [
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_annual_change_2017_2018_mean_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_annual_change_2018_2019_mean_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_annual_change_2019_2020_mean_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_annual_change_2020_2021_mean_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_annual_change_2021_2022_mean_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_annual_change_2022_2023_mean_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_annual_change_2023_2024_mean_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_annual_hotspot_2017_2018_fraction_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_annual_hotspot_2018_2019_fraction_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_annual_hotspot_2019_2020_fraction_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_annual_hotspot_2020_2021_fraction_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_annual_hotspot_2021_2022_fraction_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_annual_hotspot_2022_2023_fraction_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_annual_hotspot_2023_2024_fraction_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_change_state_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_cumulative_change_mean_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_endpoint_change_max_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_endpoint_change_mean_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_endpoint_hotspot_fraction_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_max_annual_change_mean_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_persistence_max_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_slope_mean_30m.tif",
+    "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/rasters/basscoast_variance_mean_30m.tif"
+  ],
+  "feature_table": "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/basscoast_phase9_feature_inventory.csv",
+  "feature_geojson_gzip": "/Users/thieulong/RMIT/SatelliteEmbeddingV1-SpatialAnalysis/BassCoast_Phase9_Map_Data_Preparation_outputs/basscoast_phase9_features.geojson.gz"
+}

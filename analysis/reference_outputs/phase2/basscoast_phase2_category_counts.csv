@@ -1,0 +1,10 @@
+category,candidate_pixel_count,sampled_pixel_count,max_samples_per_category
+endpoint_hotspot,4550716,10000,10000
+persistent_ge2,1992917,9984,10000
+persistent_ge3,781578,9946,10000
+high_variance,4149329,9950,10000
+positive_slope,4153371,9971,10000
+negative_slope,4156136,9976,10000
+sudden_candidate,3064197,9954,10000
+temporary_or_recovery_candidate,2150815,9926,10000
+stable_control,3484658,10000,10000
