@@ -6,6 +6,10 @@ GitHub contains source code, documentation, compact reference evidence, and the
 browser-ready application package. Multi-gigabyte scientific data lives under
 ignored `data/raw/` and `data/processed/`.
 
+At consolidation, the required analytical transfer was approximately 6.4 GB.
+The optional Sentinel-2 visual archive added approximately 4.8 GB, for a total
+local data directory of about 11.2 GB.
+
 ```text
 data/
   raw/

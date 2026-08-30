@@ -1,10 +1,10 @@
-path,retention,role
-data/raw/embedding_metrics,required,Authoritative 10 m embedding metric rasters
-data/raw/sentinel2_annual,optional,Annual 10 m visual composites for 2017-2025
-data/processed/raster_qa,recommended,Stage 1 raster health reports and figures
-data/processed/sampling,required,Stage 2 full sample review sample and thresholds
-data/processed/dea_sample,required,Stage 3 final annual DEA histories and enriched points
-data/processed/dea_wall_to_wall,recommended,Stage 4 complete-surface summary tables
-data/processed/ndvi_pilot,recommended,Stage 5 NDVI calibration evidence
-data/processed/map_grid,required,Stage 6 common-grid rasters and region geometry
-data/processed/region_context,required,Stage 7 annual DEA NDVI and region histories
+path,approximate_size,retention,role
+data/raw/embedding_metrics,4.1 GB,required,Authoritative 10 m embedding metric rasters
+data/raw/sentinel2_annual,4.8 GB,optional,Annual 10 m visual composites for 2017-2025
+data/processed/raster_qa,2.7 MB,recommended,Stage 1 raster health reports and figures
+data/processed/sampling,26 MB,required,Stage 2 full sample review sample and thresholds
+data/processed/dea_sample,1.0 GB,required,Stage 3 final annual DEA histories and enriched points
+data/processed/dea_wall_to_wall,1.6 MB,recommended,Stage 4 complete-surface summary tables
+data/processed/ndvi_pilot,6.6 MB,recommended,Stage 5 NDVI calibration evidence
+data/processed/map_grid,553 MB,required,Stage 6 common-grid rasters and region geometry
+data/processed/region_context,712 MB,required,Stage 7 annual DEA NDVI and region histories
