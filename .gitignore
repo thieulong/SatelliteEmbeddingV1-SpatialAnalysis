@@ -4,3 +4,15 @@ __pycache__/
 .venv/
 .cache/
 .matplotlib_cache/
+.tmp/
+.pnpm-store/
+*.inspect.ndjson
+~$*
+
+# Large local-only scientific data. See data/README.md.
+data/raw/**
+data/processed/**
+
+# Regenerable reports and optional research runs.
+deliverables/generated/
+research/outputs/

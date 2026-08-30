@@ -1,31 +1,51 @@
 # AusHabitat
 
-Interactive Bass Coast landscape-change explorer combining satellite-embedding change signals with DEA Land Cover and NDVI context.
+AusHabitat is a Bass Coast landscape-change prototype combining annual Google
+Satellite Embedding signals with DEA Land Cover and DEA GeoMAD NDVI context.
 
-## Project handover and analysis source
+**Published application:**
+https://thieulong.github.io/SatelliteEmbeddingV1-SpatialAnalysis/
 
-New developers and Codex instances should start with
-[`CODEX_HANDOVER.md`](CODEX_HANDOVER.md), then read the numbered files in
-[`Documentation/`](Documentation/README.md). Core notebooks, Python pipelines
-and small reference outputs from verified runs are retained under
-[`analysis/`](analysis/README.md).
+## Start here
 
-The multi-gigabyte authoritative rasters and complete generated outputs are not
-stored in GitHub. Follow the migration checklist before attempting to reproduce
-or scale the analysis.
+New developers and Codex instances must read [`CODEX_HANDOVER.md`](CODEX_HANDOVER.md)
+and the numbered [`Documentation/`](Documentation/README.md) files before
+changing analysis or application logic.
 
-The published site is a static demonstration covering 2017 to 2024. Hot spots and low-change reference regions are derived from the project analysis outputs; supporting datasets provide contextual evidence rather than causal attribution.
+## Repository structure
 
-The three map views are:
+```text
+analysis/       Eight-stage pipeline, notebooks, tools, reference evidence
+data/           Ignored local-only raw and processed scientific data
+deliverables/   Latest presentations and technical report
+Documentation/  Methods, results, decisions, boundaries, and migration
+public/         Browser-ready map data and assets
+research/       Optional external-dataset experiments
+src/            Web application JavaScript and CSS
+index.html      Static application entry point
+```
 
-- **Annual satellite:** the closest verified Esri World Imagery Wayback capture found among several nearby archive releases, with the actual date and source resolution reported.
-- **Satellite reference:** the latest Esri World Imagery basemap.
-- **Map:** OpenStreetMap places and roads.
+## Application views
 
-Wayback does not provide uniform annual photography. AusHabitat checks multiple nearby archive releases and displays imagery only when a verified local capture falls within approximately 18 months of the selected year. Otherwise, the normal map remains visible and the interface reports that no suitable nearby-year image is available.
+- **Map:** OpenStreetMap roads and places.
+- **Satellite reference:** current Esri World Imagery.
+- **Annual satellite:** nearest date-verified Esri Wayback capture within the
+  configured tolerance, with actual capture date and resolution shown.
 
-## Interpretation boundary
+## Local run
 
-Hot spots are embedding-defined change signals. DEA Land Cover and NDVI provide
-supporting context; they do not turn the result into a causal land-change label
-or a validated accuracy score.
+```bash
+python -m http.server 8093
+```
+
+Open `http://127.0.0.1:8093/`.
+
+## Scientific boundary
+
+Hot spots are strong embedding-change signals. DEA and NDVI provide supporting
+land-cover and vegetation context; they do not establish cause or constitute a
+validated accuracy score.
+
+Large rasters and completed analytical products are intentionally excluded
+from Git. Follow [`data/README.md`](data/README.md) and the
+[`MIGRATION_CHECKLIST`](Documentation/MIGRATION_CHECKLIST.md).

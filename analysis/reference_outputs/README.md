@@ -1,9 +1,11 @@
-# Reference Outputs
+# Compact Reference Outputs
 
-These are small reports, manifests and summary CSVs copied from completed runs.
-They support the numerical claims in the handover and allow a new environment
-to compare smoke-test outputs with known results.
+These small files are retained evidence from completed Bass Coast runs. They
+support the numerical statements in `Documentation/03_RESULTS_AND_LIMITATIONS.md`
+without placing multi-gigabyte working products in Git.
 
-They are not complete analytical outputs. Large per-point tables, aligned
-rasters, checkpoints, figures and browser build intermediates must be
-transferred separately as described in `Documentation/MIGRATION_CHECKLIST.md`.
+Folder names and filenames preserve historical phase identifiers. The current
+execution order is defined in `Documentation/02_CANONICAL_PIPELINE.md`.
+
+Reference outputs are not sufficient to rebuild the application. Transfer the
+ignored `data/` tree and run `analysis/tools/verify_transfer.py`.

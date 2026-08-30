@@ -1,33 +1,29 @@
-# AusHabitat Analysis Source
+# AusHabitat Analysis
 
-This directory contains the analysis code retained for project handover.
+The retained implementation is organized by purpose rather than by the old,
+non-contiguous phase numbers.
 
-## Contents
+## Canonical pipeline
 
-- `notebooks/`: Phase 1 raster inspection and Phase 2 pixel sampling notebooks.
-- `scripts/`: local Python pipelines for DEA, NDVI, map preparation and reports.
-- `gee/`: retained optional Sentinel-2 visual export and its provenance note.
-- `reference_outputs/`: small summaries from verified runs; bulk outputs and
-  rasters are intentionally excluded.
-- `study_design/`: retained NDVI comparison design.
+| Stage | Source | Purpose |
+| --- | --- | --- |
+| 1 | `notebooks/BassCoast_Phase1_Raster_Inspection.ipynb` | Memory-safe raster QA |
+| 2 | `notebooks/BassCoast_Phase2_Pixel_Sampling.ipynb` | Reproducible behavioural sampling |
+| 3 | `pipeline/stage03_dea_enrichment.py` | Annual DEA histories for sampled points |
+| 4 | `pipeline/stage04_dea_wall_to_wall.py` | Wall-to-wall DEA comparison summaries |
+| 5 | `pipeline/stage05_ndvi_pilot.py` | NDVI threshold and association pilot |
+| 6 | `pipeline/stage06_map_grid.py` | Common 30 m map grid and regions |
+| 7 | `pipeline/stage07_region_context.py` | Complete DEA and NDVI region histories |
+| 8 | `pipeline/stage08_package_web_data.py` | Browser-ready map package |
 
-Read `../CODEX_HANDOVER.md` and `../Documentation/04_DATA_AND_REPRODUCTION.md`
-before running these files. Most scripts expect transferred local data folders
-at the repository root.
+`notebooks/builders/` contains the notebook constructors. `reporting/` contains
+optional report-generation scripts. `tools/` contains migration and imagery
+checks. `reference_outputs/` contains compact evidence from completed runs;
+the large working datasets live under the ignored `../data/` directory.
 
-## Environment
+The output filenames still contain historical `phaseN` identifiers. They are
+retained to preserve provenance and avoid silently invalidating completed-run
+manifests.
 
-The last verified local environment used Python 3.12 with the versions recorded
-in `requirements.txt`. A clean virtual environment is recommended; do not copy
-the old `.venv` between computers.
-
-## Source status
-
-The scripts are snapshots of the working Bass Coast implementation. Phase 3,
-Phase 5, Phase 9 and Phase 10 support checkpointing or self-tests. The notebooks
-retain their Colab/Drive-oriented paths and may need a project-path edit for a
-fully local rerun.
-
-`scripts/prepare_app_data.py` rebuilds the browser-ready `public/data` package
-from transferred Phase 9 and Phase 10 outputs. It rewrites generated browser
-assets, so commit or back up the current package before using it.
+Create a fresh Python 3.12 virtual environment and install
+`analysis/requirements.txt`. Do not migrate `.venv` or Python caches.

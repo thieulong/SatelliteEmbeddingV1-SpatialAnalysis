@@ -1,9 +1,10 @@
-directory,approximate_size,status,purpose
-GEE_BassCoast_Data,4.1 GB,local_only_essential,Authoritative 10 m embedding metric rasters and Earth Engine exports
-BassCoast_Phase2_Pixel_Sampling_outputs,26 MB,local_only_essential,Full 89707-point sample and 900-point review subset
-BassCoast_Phase3_DEA_LandCover_Pipeline_outputs_full_sample,2.4 GB,local_only_preserve,Completed sampled DEA enrichment and checkpoints
-BassCoast_Phase5_WallToWall_DEA_Summary_outputs,69 MB,local_only_preserve,Complete-raster DEA category summaries
-BassCoast_Phase8_NDVI_Pilot_outputs,7.7 MB,local_only_preserve,900-point NDVI pilot outputs
-BassCoast_Phase9_Map_Data_Preparation_outputs,554 MB,local_only_essential,30 m state raster and interaction geometry
-BassCoast_Phase10_WallToWall_Context_outputs,747 MB,local_only_essential,Aligned annual DEA and NDVI rasters plus region histories
-AusHabitat_Sentinel2_Annual,4.8 GB,local_only_optional,Nine annual 10 m true-colour visual exports for 2017-2025
+path,retention,role
+data/raw/embedding_metrics,required,Authoritative 10 m embedding metric rasters
+data/raw/sentinel2_annual,optional,Annual 10 m visual composites for 2017-2025
+data/processed/raster_qa,recommended,Stage 1 raster health reports and figures
+data/processed/sampling,required,Stage 2 full sample review sample and thresholds
+data/processed/dea_sample,required,Stage 3 final annual DEA histories and enriched points
+data/processed/dea_wall_to_wall,recommended,Stage 4 complete-surface summary tables
+data/processed/ndvi_pilot,recommended,Stage 5 NDVI calibration evidence
+data/processed/map_grid,required,Stage 6 common-grid rasters and region geometry
+data/processed/region_context,required,Stage 7 annual DEA NDVI and region histories

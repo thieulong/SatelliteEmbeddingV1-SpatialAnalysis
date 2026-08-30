@@ -1,45 +1,49 @@
 # Migration Checklist
 
-## On the old computer
+## Old computer
 
-- [ ] Confirm all long-running processes have finished.
-- [ ] Push the latest Git branch and record the commit hash.
-- [ ] Copy the essential local data directories listed in
-  `04_DATA_AND_REPRODUCTION.md` to an external drive or object storage.
-- [ ] Copy presentations, LaTeX report sources and any unpublished figures if
-  they are needed; they are not all part of the deployed branch.
-- [ ] Export the original Earth Engine embedding script from the GEE Code Editor.
-- [ ] Record any credentials or cloud configuration separately. Never commit
-  secret tokens.
-- [ ] Keep the old computer unchanged until the new-machine verification passes.
+- [ ] Confirm no pipeline or file-transfer process is running.
+- [ ] Confirm GitHub `main` contains the consolidation commit.
+- [ ] Copy the complete ignored `data/` directory to external storage.
+- [ ] Generate and retain checksums for `data/raw/` and required completed
+      products under `data/processed/`.
+- [ ] Confirm both PowerPoint files and the technical report exist under
+      `deliverables/`.
+- [ ] Export the original embedding Earth Engine script into
+      `analysis/gee/basscoast_embedding_change.js` if available.
+- [ ] Store credentials separately; never place secrets in the repository.
+- [ ] Retain the dated pre-consolidation archive until the new computer passes
+      all checks.
 
-## On the new computer
+## New computer
 
 - [ ] Clone the GitHub repository.
-- [ ] Ask the new Codex instance to read `CODEX_HANDOVER.md` and all files under
-  `Documentation/` before proposing changes.
-- [ ] Copy the large data directories into the repository root.
-- [ ] Recreate `.venv`; do not copy the old virtual environment.
-- [ ] Install `analysis/requirements.txt`.
-- [ ] Run `analysis/scripts/verify_transfer.py --project-root .`.
-- [ ] Compile all scripts.
-- [ ] Run Phase 5 and Phase 10 self-tests.
-- [ ] Run a 10-point Phase 3 network smoke test.
-- [ ] Compare smoke-test results and warnings with `analysis/reference_outputs/`.
-- [ ] Serve the static app locally and test search, filters, region selection,
-  timeline, DEA/NDVI context and all three basemap modes.
-- [ ] Confirm the published GitHub Pages URL still works.
+- [ ] Ask Codex to read `CODEX_HANDOVER.md` and all `Documentation/` files
+      before proposing work.
+- [ ] Copy the transferred `data/` directory into the repository root.
+- [ ] Create a fresh Python 3.12 `.venv` and install
+      `analysis/requirements.txt`.
+- [ ] Run `python analysis/tools/verify_transfer.py --project-root .`.
+- [ ] If transferred, verify optional imagery with
+      `--include-optional-imagery`.
+- [ ] Compile all Python and notebook code cells.
+- [ ] Run Stage 4 and Stage 7 self-tests.
+- [ ] Run a 10-point Stage 3 network smoke test.
+- [ ] Compare smoke outputs with `analysis/reference_outputs/`.
+- [ ] Serve the app locally and test filters, details, timeline, and basemaps.
+- [ ] Confirm the published GitHub Pages application still works.
 
-## Validation record to create
+## Migration verification record
 
-Create a dated migration note containing:
+Create a dated text file containing:
 
 - operating system and architecture;
-- Python, Rasterio and GDAL versions;
+- Python, Rasterio, and GDAL versions;
 - Git commit hash;
-- available local data folders and sizes;
-- self-test outcomes;
-- Phase 3 coordinate-smoke coverage and warnings; and
-- web-app browser/viewport checks.
+- transferred directory sizes and checksums;
+- transfer-check and self-test results;
+- Stage 3 smoke-test coverage and warnings;
+- browser and viewport checks; and
+- any differences from the retained reference outputs.
 
-Do not start Australia-wide processing until this record is complete.
+Do not begin Australia-wide processing until this record is complete.
