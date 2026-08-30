@@ -9,8 +9,7 @@
       products under `data/processed/`.
 - [ ] Confirm both PowerPoint files and the technical report exist under
       `deliverables/`.
-- [ ] Export the original embedding Earth Engine script into
-      `analysis/gee/basscoast_embedding_change.js` if available.
+- [ ] Confirm all three project-owned scripts exist under `analysis/gee/`.
 - [ ] Store credentials separately; never place secrets in the repository.
 - [ ] Retain the dated pre-consolidation archive until the new computer passes
       all checks.

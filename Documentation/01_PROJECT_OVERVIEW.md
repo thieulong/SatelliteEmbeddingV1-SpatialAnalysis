@@ -1,6 +1,6 @@
 # Project Overview
 
-Status date: 2026-08-30
+Status date: 2026-08-31
 
 ## Purpose
 
@@ -24,6 +24,8 @@ It does not yet provide causal event labels or predictions.
 
 - Annual 2017-2024 embedding-change rasters were exported and passed alignment
   and data-health checks.
+- The complete project-owned Earth Engine embedding workflow and its earlier
+  time-series predecessor are retained under `analysis/gee/`.
 - A reproducible 89,707-point behavioural sample and a 900-point review subset
   were created without flattening the full raster surface.
 - Complete annual DEA Level 3 and Level 4 histories were retrieved for the
@@ -77,7 +79,6 @@ between co-located annual vectors is the implemented change magnitude.
 ## What is not complete
 
 - Australia-wide processing and national storage architecture.
-- Versioned source for the original embedding Earth Engine export.
 - Independent field/reference validation and a formal accuracy assessment.
 - A causal real-world change classifier.
 - A supervised prediction model.
@@ -85,6 +86,7 @@ between co-located annual vectors is the implemented change magnitude.
 
 ## Immediate priority after migration
 
-Verify the consolidated local data, export the missing Earth Engine source,
-reproduce a Bass Coast smoke test, then design tiled national processing and
-cloud-native storage before expanding the area of interest.
+Verify the consolidated local data and recovered Earth Engine sources,
+reproduce a Bass Coast smoke test, then design tiled national processing,
+versioned run manifests, and cloud-native storage before expanding the area of
+interest.

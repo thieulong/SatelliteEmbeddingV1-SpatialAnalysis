@@ -12,6 +12,8 @@ the latest deliverables.
 
 - Current GitHub Pages application and browser-ready map package.
 - Two verified notebooks and their builders.
+- Canonical and predecessor Earth Engine embedding workflows plus the optional
+  Sentinel-2 visual export.
 - Eight-stage local analysis pipeline.
 - Compact reference outputs supporting reported results.
 - Authoritative embedding metric rasters.

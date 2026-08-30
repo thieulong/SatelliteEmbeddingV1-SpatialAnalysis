@@ -34,6 +34,8 @@ low-change references.
 
 - `analysis/`: eight-stage scientific pipeline, notebooks, tools, and compact
   reference evidence.
+- `analysis/gee/`: recovered project-owned Earth Engine embedding workflows and
+  the optional Sentinel-2 visual export.
 - `data/`: ignored local-only raw and processed data; see `data/README.md`.
 - `public/`, `src/`, `index.html`: deployed static web application.
 - `deliverables/`: latest presentations and technical report.
@@ -65,10 +67,11 @@ low-change references.
 6. Keep detection, contextual interpretation, validation, and future
    prediction as separate stages with explicit provenance.
 
-## Known reproducibility gap
+## Reproducibility status
 
-The original Earth Engine source that generated the 64-dimensional embedding
-change rasters has not yet been exported from the owner's GEE account. Save it
-as `analysis/gee/basscoast_embedding_change.js` before national scaling. The
-implemented equations, thresholds, expected outputs, and the separate
-Sentinel-2 visual export are documented, but they do not replace that source.
+The project-owned Earth Engine source is retained under `analysis/gee/`.
+`hotspot_characterization_analysis.js` is the canonical complete Bass Coast
+embedding workflow; `hotspot_timeseries_analysis.js` is its earlier lighter
+time-series predecessor. National scaling still requires a versioned run
+manifest recording the dataset version, AOI/tiling scheme, masks, thresholds,
+CRS, scale, years, export names, and output checksums.

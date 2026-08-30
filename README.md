@@ -12,6 +12,22 @@ New developers and Codex instances must read [`CODEX_HANDOVER.md`](CODEX_HANDOVE
 and the numbered [`Documentation/`](Documentation/README.md) files before
 changing analysis or application logic.
 
+## Python setup
+
+Use Python 3.12 and create a fresh repository-local virtual environment:
+
+```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r analysis/requirements.txt
+python analysis/tools/verify_transfer.py --project-root .
+```
+
+The dependency versions are pinned in `analysis/requirements.txt`. Large local
+scientific data is not downloaded by Git and must be copied separately into
+`data/` as described in `Documentation/MIGRATION_CHECKLIST.md`.
+
 ## Repository structure
 
 ```text

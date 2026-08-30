@@ -1,5 +1,5 @@
 {
-  "status_date": "2026-08-30",
+  "status_date": "2026-08-31",
   "study_area": "Bass Coast, Victoria, Australia",
   "analysis_years": [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
   "pipeline_stages": 8,
@@ -31,5 +31,10 @@
     "data/processed/ndvi_pilot"
   ],
   "scientific_boundary": "Embedding hot spots are change signals; DEA and NDVI provide context, not causal labels or ground-truth accuracy.",
-  "known_gap": "Export the original embedding-processing Earth Engine source as analysis/gee/basscoast_embedding_change.js before national scaling."
+  "gee_source": {
+    "canonical": "analysis/gee/hotspot_characterization_analysis.js",
+    "earlier_timeseries": "analysis/gee/hotspot_timeseries_analysis.js",
+    "optional_visual_export": "analysis/gee/export_sentinel2_annual.js"
+  },
+  "known_gap": "Australia-wide execution still requires a versioned tiling, storage, checkpoint, and run-manifest design."
 }

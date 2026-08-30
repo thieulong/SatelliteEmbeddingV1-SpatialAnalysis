@@ -72,14 +72,16 @@ composites from Sentinel-2 Level-2A surface reflectance using Cloud Score+ and a
 median composite. Local GeoTIFFs live in `data/raw/sentinel2_annual/`.
 
 These rasters are optional visual experiments. They are not current
-application basemaps and do not replace the missing embedding-processing GEE
-source.
+application basemaps and do not replace the embedding-processing workflow.
 
 ## Original project-owned sources
 
 The following project-owned assets require version/provenance protection:
 
-- original Earth Engine embedding-change script (still missing from Git);
+- canonical Earth Engine embedding-change script
+  (`analysis/gee/hotspot_characterization_analysis.js`);
+- earlier lighter Earth Engine time-series script
+  (`analysis/gee/hotspot_timeseries_analysis.js`);
 - exported 10 m embedding metric rasters;
 - thresholds and behavioural rules;
 - processed 30 m map/context products;

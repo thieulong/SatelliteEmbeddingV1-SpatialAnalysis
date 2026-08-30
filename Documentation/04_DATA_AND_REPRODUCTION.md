@@ -71,8 +71,8 @@ but are not required by the current GitHub Pages application.
 - annual-change variance and slope; and
 - first-hot-spot and maximum-change year.
 
-Do not recompute or overwrite these files until the original Earth Engine
-source and collection version have been recorded.
+Do not recompute or overwrite these files until the recovered Earth Engine
+source, collection version, and run parameters have been recorded.
 
 ## Environment setup
 
@@ -139,18 +139,19 @@ retained products.
 Never remove checkpoints from an active or failed run until its recovery value
 has been assessed.
 
-## Original Earth Engine source
+## Earth Engine source
 
-Export the missing embedding-processing script from the Earth Engine Code
-Editor and save it as:
+The project-owned Earth Engine workflows are retained in `analysis/gee/`:
 
-```text
-analysis/gee/basscoast_embedding_change.js
-```
+- `hotspot_characterization_analysis.js`: canonical complete Bass Coast
+  embedding-change and export workflow;
+- `hotspot_timeseries_analysis.js`: earlier lighter time-series workflow,
+  retained for provenance; and
+- `export_sentinel2_annual.js`: optional annual visual-imagery export.
 
-Record collection ID, collection version, AOI, land mask, thresholds, exports,
-scale, CRS, and date ranges in the source comments. The retained
-`analysis/gee/export_sentinel2_annual.js` is only the optional visual export.
+Every rerun must record collection ID/version, AOI, land mask, thresholds,
+exports, scale, CRS, and date ranges. The Sentinel-2 visual export is not a
+substitute for the embedding workflow.
 
 ## National scaling
 
