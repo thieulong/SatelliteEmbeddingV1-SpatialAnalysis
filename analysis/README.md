@@ -26,4 +26,5 @@ retained to preserve provenance and avoid silently invalidating completed-run
 manifests.
 
 Create a fresh Python 3.12 virtual environment and install
-`analysis/requirements.txt`. Do not migrate `.venv` or Python caches.
+`requirements.txt` from the repository root. Do not migrate `.venv` or Python
+caches.

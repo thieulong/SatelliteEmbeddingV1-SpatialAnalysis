@@ -21,7 +21,7 @@
       before proposing work.
 - [ ] Copy the transferred `data/` directory into the repository root.
 - [ ] Create a fresh Python 3.12 `.venv` and install
-      `analysis/requirements.txt`.
+      `requirements.txt` from the repository root.
 - [ ] Run `python analysis/tools/verify_transfer.py --project-root .`.
 - [ ] If transferred, verify optional imagery with
       `--include-optional-imagery`.

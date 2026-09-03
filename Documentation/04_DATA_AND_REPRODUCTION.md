@@ -80,7 +80,7 @@ source, collection version, and run parameters have been recorded.
 python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install -r analysis/requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 Do not migrate `.venv`, `.matplotlib_cache`, `.cache`, `.tmp`, `__pycache__`, or
