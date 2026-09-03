@@ -31,16 +31,19 @@ For the seven annual distances `d_1 ... d_7`:
 - **Cumulative change:** `sum(d_t)`.
 - **Mean annual change:** `mean(d_t)`.
 - **Maximum annual change:** `max(d_t)`.
-- **Persistence count:** number of intervals where `d_t >= 0.45`.
+- **Persistence count:** number of intervals where `d_t > 0.45`, matching the
+  strict comparison implemented in the Earth Engine source.
 - **Variance:** mean squared deviation from the seven-value mean.
 - **Slope:** ordinary least-squares slope of annual distance against interval
   index `1..7`.
 - **First hot-spot year:** first interval exceeding the annual threshold.
 - **Maximum-change year:** interval containing the largest distance.
 
-The fixed annual hot-spot threshold is `0.45`. The endpoint hot-spot threshold
-is the empirical endpoint 95th percentile. The endpoint and variance/slope
-percentile thresholds used for sampling are recorded in
+The fixed annual hot-spot rule is `d_t > 0.45`. The practical difference from
+`d_t >= 0.45` is negligible for floating-point raster values, but the strict
+operator records the implemented method. The endpoint hot-spot threshold is the
+empirical endpoint 95th percentile. The endpoint and variance/slope percentile
+thresholds used for sampling are recorded in
 `data/processed/sampling/tables/phase2_thresholds.csv` and compactly in
 `analysis/reference_outputs/phase2/phase2_thresholds.csv`.
 
@@ -145,8 +148,10 @@ Output: `data/processed/ndvi_pilot/`.
 
 Source: `analysis/pipeline/stage06_map_grid.py`
 
-- Aggregates aligned 10 m embedding metrics to approximately 30 m using a
-  factor of three.
+- Aggregates/resamples aligned 10 m embedding metrics to an approximately 30 m
+  common-support grid using a target-grid factor of three. Masks, nodata,
+  raster boundaries, and alignment mean a target cell does not necessarily
+  summarize exactly nine valid source cells.
 - Creates change-state cells from endpoint, annual, persistence, variance, and
   slope evidence.
 - Applies minimum connected-patch sizes.

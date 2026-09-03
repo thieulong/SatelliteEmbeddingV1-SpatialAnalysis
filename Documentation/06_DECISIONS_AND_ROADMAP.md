@@ -1,5 +1,11 @@
 # Decisions and Roadmap
 
+The roadmap in this document is a set of long-term recommendations, not an
+approved immediate implementation plan. Scientific validation, national
+processing, cloud infrastructure, web-product development, and modelling are
+separate workstreams. A planning decision must select and define the next
+milestone before work begins.
+
 ## Decision principles
 
 - Prefer evidence that can be reproduced from coordinates and annual products.
@@ -52,10 +58,12 @@ Level 4 class is more spatially precise than the native DEA support.
 ### Approximately 30 m common support
 
 Embedding metrics originate at 10 m; DEA Land Cover and GeoMAD NDVI are
-approximately 30 m. The application aggregates three-by-three embedding cells
-to a common 30 m grid rather than pretending each 10 m cell has independent
-30 m context. The original 10 m rasters remain authoritative and available for
-fine-scale analysis.
+approximately 30 m. The application aggregates/resamples the embedding products
+to an approximately 30 m common-support grid using a target-grid factor of
+three rather than pretending each 10 m cell has independent 30 m context.
+Masks, nodata, boundaries, and alignment mean a target cell does not always
+represent exactly nine valid source cells. The original 10 m rasters remain
+authoritative and available for fine-scale analysis.
 
 ### NDVI added as continuous vegetation evidence
 
@@ -109,7 +117,10 @@ for national delivery.
   clustering, and future predictive models.
 - Build toward an interactive national map and eventually mobile access.
 
-## Roadmap
+## Candidate future workstreams
+
+The sections below describe possible work within separate workstreams. Their
+numbering is organizational and does not prescribe execution order.
 
 ### 1. Complete reproducibility
 
@@ -153,9 +164,9 @@ Potential models include event prioritization, anomaly ranking, clustering, or
 forecasting. They require a governed training/evaluation dataset with explicit
 labels and provenance. DEA/NDVI agreement alone is not sufficient ground truth.
 
-## Definition of the next milestone
+## Milestone selection status
 
-The next defensible milestone is not “Australia complete.” It is a versioned,
-tile-based pipeline that reproduces Bass Coast, succeeds on several diverse
-pilot tiles, records costs and failures, and serves those tiles through the
-same API/data contract planned for national deployment.
+The next milestone is intentionally unselected. It will be defined through a
+planning discussion before implementation. The current approved action is only
+to preserve the frozen Bass Coast regression baseline described in
+`07_BASS_COAST_REGRESSION_BASELINE.md`.

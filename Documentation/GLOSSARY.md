@@ -4,7 +4,8 @@
 Embedding distance between the same mapped location in consecutive years.
 
 **Annual hot spot**
-A valid pixel whose annual embedding distance is at least `0.45`.
+A valid pixel whose annual embedding distance is strictly greater than `0.45`,
+matching the comparison implemented in the Earth Engine source.
 
 **Australian Albers (`EPSG:3577`)**
 An Australia-centred equal-area coordinate system measured in metres. It is
@@ -23,8 +24,10 @@ variance, and slope near zero. It is a comparison reference, not proof that
 nothing changed.
 
 **Common-support grid**
-The approximately 30 m grid used to combine 10 m embedding metrics with 30 m
-DEA and NDVI context.
+The approximately 30 m aggregation/resampling grid used to combine 10 m
+embedding metrics with 30 m DEA and NDVI context. Its target grid uses a factor
+of three, but masks and alignment mean a cell does not necessarily contain
+exactly nine valid embedding cells.
 
 **Cumulative change**
 Sum of the seven annual embedding distances.

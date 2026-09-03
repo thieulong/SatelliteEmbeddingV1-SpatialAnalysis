@@ -1,8 +1,15 @@
 {
-  "status_date": "2026-08-31",
+  "status_date": "2026-09-03",
   "study_area": "Bass Coast, Victoria, Australia",
   "analysis_years": [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
   "pipeline_stages": 8,
+  "regression_baseline": {
+    "id": "bass-coast-regression-2026-09-03",
+    "git_tag": "bass-coast-regression-2026-09-03",
+    "source_commit": "b75da7ac54f47ebee26742e8dee0266c13021597",
+    "status": "frozen",
+    "next_milestone": "unselected_pending_planning"
+  },
   "published_application": "https://thieulong.github.io/SatelliteEmbeddingV1-SpatialAnalysis/",
   "counts": {
     "grid_cells_10m": 191224634,
@@ -31,10 +38,12 @@
     "data/processed/ndvi_pilot"
   ],
   "scientific_boundary": "Embedding hot spots are change signals; DEA and NDVI provide context, not causal labels or ground-truth accuracy.",
+  "annual_hotspot_rule": "embedding_distance > 0.45",
+  "common_support_note": "The approximately 30 m layer aggregates/resamples 10 m embedding products; masks and grid alignment mean a target cell does not necessarily contain exactly nine valid source cells.",
   "gee_source": {
     "canonical": "analysis/gee/hotspot_characterization_analysis.js",
     "earlier_timeseries": "analysis/gee/hotspot_timeseries_analysis.js",
     "optional_visual_export": "analysis/gee/export_sentinel2_annual.js"
   },
-  "known_gap": "Australia-wide execution still requires a versioned tiling, storage, checkpoint, and run-manifest design."
+  "planning_status": "Scientific validation, national processing, cloud infrastructure, and web-product development are separate workstreams; no next milestone is approved."
 }

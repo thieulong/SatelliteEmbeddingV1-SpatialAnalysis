@@ -84,9 +84,13 @@ between co-located annual vectors is the implemented change magnitude.
 - A supervised prediction model.
 - Production APIs, authentication, monitoring, or mobile application.
 
-## Immediate priority after migration
+## Current checkpoint and next-step status
 
-Verify the consolidated local data and recovered Earth Engine sources,
-reproduce a Bass Coast smoke test, then design tiled national processing,
-versioned run manifests, and cloud-native storage before expanding the area of
-interest.
+The consolidated data, environment, recovered Earth Engine sources, smoke
+tests, and browser application have passed migration checks. The current Bass
+Coast state is frozen in `07_BASS_COAST_REGRESSION_BASELINE.md`.
+
+No immediate implementation milestone is approved. Scientific validation,
+national processing, cloud infrastructure, and web-product development are
+separate workstreams. The next milestone will be selected and defined in a
+planning discussion before implementation begins.

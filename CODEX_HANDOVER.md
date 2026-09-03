@@ -11,10 +11,11 @@ This is the mandatory entry point for a new Codex instance or developer.
 5. `Documentation/04_DATA_AND_REPRODUCTION.md`
 6. `Documentation/05_WEB_APPLICATION.md`
 7. `Documentation/06_DECISIONS_AND_ROADMAP.md`
-8. `Documentation/SOURCES_AND_PROVENANCE.md`
-9. `Documentation/GLOSSARY.md`
-10. `Documentation/MIGRATION_CHECKLIST.md`
-11. `Documentation/CLEANUP_MANIFEST.md`
+8. `Documentation/07_BASS_COAST_REGRESSION_BASELINE.md`
+9. `Documentation/SOURCES_AND_PROVENANCE.md`
+10. `Documentation/GLOSSARY.md`
+11. `Documentation/MIGRATION_CHECKLIST.md`
+12. `Documentation/CLEANUP_MANIFEST.md`
 
 ## Current checkpoint
 
@@ -29,6 +30,10 @@ The published application is
 `https://thieulong.github.io/SatelliteEmbeddingV1-SpatialAnalysis/`.
 It contains 13,784 interaction regions: 13,477 change regions and 307
 low-change references.
+
+This checkpoint is frozen as `bass-coast-regression-2026-09-03`. No next
+implementation milestone has been approved; milestone selection requires a
+planning discussion.
 
 ## Canonical repository layout
 
@@ -55,7 +60,9 @@ low-change references.
 - The 191,224,634 figure is the complete 10 m rectangular grid, not a table of
   enriched records. There are 83,045,578 finite endpoint cells.
 - The embedding metrics remain authoritative at 10 m. Integrated DEA/NDVI and
-  application analysis use an approximately 30 m common-support grid.
+  application analysis use an approximately 30 m common-support
+  aggregation/resampling. Masks and alignment mean a target cell does not
+  necessarily contain exactly nine valid source cells.
 
 ## Before changing anything
 

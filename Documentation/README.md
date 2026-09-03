@@ -1,9 +1,9 @@
 # AusHabitat Documentation
 
-This documentation describes the consolidated project state as of
-2026-08-30. Historical phase names remain inside existing output filenames,
-but current work should use the eight canonical stages in
-`02_CANONICAL_PIPELINE.md`.
+This documentation describes the consolidated project state, with the Bass
+Coast regression checkpoint frozen on 2026-09-03. Historical phase names
+remain inside existing output filenames, but current work should use the eight
+canonical stages in `02_CANONICAL_PIPELINE.md`.
 
 | Document | Purpose |
 | --- | --- |
@@ -13,6 +13,7 @@ but current work should use the eight canonical stages in
 | `04_DATA_AND_REPRODUCTION.md` | Local data layout, retention, environment, and checks |
 | `05_WEB_APPLICATION.md` | App data model, controls, imagery, and deployment |
 | `06_DECISIONS_AND_ROADMAP.md` | Decision history, stakeholder direction, and future work |
+| `07_BASS_COAST_REGRESSION_BASELINE.md` | Frozen checkpoint and regression contract |
 | `SOURCES_AND_PROVENANCE.md` | Authoritative external sources and version risks |
 | `GLOSSARY.md` | Plain-language terminology |
 | `MIGRATION_CHECKLIST.md` | Old-machine and new-machine transfer procedure |
