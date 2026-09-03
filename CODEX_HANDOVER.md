@@ -69,10 +69,6 @@ low-change references.
 
 ## Reproducibility status
 
-Commit `fcb52a4` is the migration baseline, not a permanently current project
-commit. Reproduction and future run records must capture the actual Git `HEAD`
-used for that run.
-
 The project-owned Earth Engine source is retained under `analysis/gee/`.
 `hotspot_characterization_analysis.js` is the canonical complete Bass Coast
 embedding workflow; `hotspot_timeseries_analysis.js` is its earlier lighter
