@@ -67,12 +67,48 @@ through SharePoint and matched the original exactly:
 The round trip therefore passed. A durable copy of the result is in the Team's
 `00_Admin/Storage_Readiness_Test_2026-10-28.md`.
 
+## Medium-volume retained-product test
+
+The genuine retained-product test used 201 Bass Coast files totalling
+6,830,452,076 bytes (6.36 GiB). It included the source embedding metrics and
+the processed DEA sample, common-grid, regional-context, sampling, raster-QA,
+DEA wall-to-wall and NDVI-pilot trees. Optional Sentinel-2 annual display
+imagery was deliberately excluded because it is contextual imagery rather
+than a detection input and requires a separate retention decision.
+
+The local copy into the OneDrive File Provider took 31.28 seconds. Cloud
+convergence was checked separately: SharePoint displayed the release README,
+manifest and data hierarchy, including all 17 files in the largest DEA sample
+folder after the final two large CSVs completed upload. A 333,588,134-byte
+GeoTIFF was then downloaded through the SharePoint interface and matched the
+pre-transfer manifest exactly:
+
+- file: `data/raw/embedding_metrics/basscoast_annual_change_2017_2018.tif`;
+- SHA-256:
+  `35446bc24a0dc87814df27cfed64422a812e0517e24ce3f40ed1310316b9bd2c`.
+
+The medium-volume round trip therefore passed. The immutable package was
+promoted from transfer staging to
+`02_Verified_Releases/Bass_Coast/Bass_Coast_Regression_2026-09-03`.
+
+## National evidence-pilot archive
+
+The completed national evidence pilot was packaged separately at
+`02_Verified_Releases/National_Pilot/National_Evidence_Pilot_2026-10-28`.
+It contains the raw and processed national-pilot trees, comprising 72
+manifested files and 531,386,460 bytes, plus its README and manifest. Both the
+staging copy and the OneDrive copy passed byte-count and SHA-256 verification.
+macOS File Provider checks then confirmed that all 74 package objects had
+settled with no items still syncing.
+
+This archive supports the bounded 1,400-point evidence result. It is not a
+wall-to-wall national raster release and does not select a national hot-spot
+threshold.
+
 ## Remaining storage gates
 
-The small test does not establish sustained multi-terabyte transfer
-performance, very large item-count behaviour, version-history overhead,
-retention/restore policy, or RMIT tenant-pool availability. The next storage
-test must use a genuine 5–10 GB retained-product package, preserve checksums,
-measure transfer time, download at least one representative large object, and
-return the verified Team folder to online-only status. Do not manufacture bulk
-by duplicating files merely to reach a target size.
+The tests do not establish sustained multi-terabyte transfer performance, very
+large item-count behaviour, version-history overhead, retention/restore policy,
+or RMIT tenant-pool availability. Those administrative and production-scale
+gates remain unresolved. Do not manufacture bulk by duplicating files merely
+to reach a target size.
