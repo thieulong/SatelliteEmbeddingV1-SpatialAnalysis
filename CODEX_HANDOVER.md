@@ -12,10 +12,13 @@ This is the mandatory entry point for a new Codex instance or developer.
 6. `Documentation/05_WEB_APPLICATION.md`
 7. `Documentation/06_DECISIONS_AND_ROADMAP.md`
 8. `Documentation/07_BASS_COAST_REGRESSION_BASELINE.md`
-9. `Documentation/SOURCES_AND_PROVENANCE.md`
-10. `Documentation/GLOSSARY.md`
-11. `Documentation/MIGRATION_CHECKLIST.md`
-12. `Documentation/CLEANUP_MANIFEST.md`
+9. `Documentation/08_NATIONAL_SCALING_PILOT_2026-09-21.md`
+10. `Documentation/09_NATIONAL_EVIDENCE_PILOT_2026-09-30.md`
+11. `Documentation/10_STORAGE_RETENTION_AND_TEAMS_TEST_2026-10-28.md`
+12. `Documentation/SOURCES_AND_PROVENANCE.md`
+13. `Documentation/GLOSSARY.md`
+14. `Documentation/MIGRATION_CHECKLIST.md`
+15. `Documentation/CLEANUP_MANIFEST.md`
 
 ## Current checkpoint
 
@@ -31,9 +34,14 @@ The published application is
 It contains 13,784 interaction regions: 13,477 change regions and 307
 low-change references.
 
-This checkpoint is frozen as `bass-coast-regression-2026-09-03`. No next
-implementation milestone has been approved; milestone selection requires a
-planning discussion.
+The Bass Coast checkpoint is frozen as `bass-coast-regression-2026-09-03`.
+The bounded mainland-and-Tasmania evidence pilot is also complete: all 1,400
+planned observations passed reconciliation and numerical QA, and the first
+area-weighted threshold-sensitivity summaries are reproducible. A small RMIT
+Teams/SharePoint storage round trip passed on 2026-10-28. See Documents 09 and
+10 for the evidence and storage boundaries. None of this approves wall-to-wall
+national processing, a final threshold, infrastructure provisioning, or
+expansion of the published application.
 
 ## Canonical repository layout
 
