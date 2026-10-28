@@ -105,6 +105,12 @@ This archive supports the bounded 1,400-point evidence result. It is not a
 wall-to-wall national raster release and does not select a national hot-spot
 threshold.
 
+After final SharePoint inspection, the Bass Coast release, national-pilot
+release and initial readiness-test package were returned to online-only status
+with OneDrive **Free Up Space**. Finder reported each folder as `Not
+Downloaded`, and each package reported 0 B local disk usage while remaining
+available in SharePoint.
+
 ## Remaining storage gates
 
 The tests do not establish sustained multi-terabyte transfer performance, very
